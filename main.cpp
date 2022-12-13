@@ -25,9 +25,9 @@ int main ()
             cin>>index;
             database_.find(index);
         }
-        // if(op=="delete"){
-        //     cin>>index>>value;
-        //     database_.Delete(index,value);
-        // }
+        if(op=="delete"){
+            cin>>index>>value;
+            // database_.Delete(index,value);
+        }
     }
 }
