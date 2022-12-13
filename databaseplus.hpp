@@ -225,6 +225,7 @@ public:
     }
     void find (std::string index_){
         int i=1;
+        bool flag=1;
         while(true){
             head temp;temp=gethead(i);
             std::string s1=temp.from,s2=temp.to;
@@ -234,12 +235,16 @@ public:
                 for(int j=1;j<=temp.num;j++){
                     data tem;tem=getdata(i,j);
                     std::string s=tem.index;
-                    if(s==index_)std::cout<<tem.value<<' ';
+                    if(s==index_){
+                        std::cout<<tem.value<<' ';
+                        flag=0;
+                    }
                 }
             }
             if(temp.next_head_num!=0)i=temp.next_head_num;
             else break;
         }
+        if(flag)std::cout<<"null";
         std::cout<<'\n';
     }
 };
