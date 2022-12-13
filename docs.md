@@ -241,7 +241,7 @@ log
 
 ## 各个类的接口和成员说明
 
-### **TokenScnner类**
+### **TokenScanner类**
 
 成员：
 - std::string line 存储要处理的字符串
