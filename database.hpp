@@ -70,13 +70,14 @@ public:
             outfile.write(reinterpret_cast<const char *>(&h),sizeof(head));//更新头节点
             return;
         }
+        data tem1,tem2;
         for(int i=1;i<h.num;i++){//插在中间
-            data tem1,tem2;
             outfile.seekg((i-1)*sizeof(data)+sizeof(head));
             outfile.read(reinterpret_cast<char *>(&tem1),sizeof(data));
             outfile.seekg((i)*sizeof(data)+sizeof(head));
             outfile.read(reinterpret_cast<char *>(&tem2),sizeof(data));
             if(temp>=tem1 && temp<=tem2){
+                //std::cout<<114<<' '<<index_;
                 for(int j=h.num+1;j>=i+1;j--){//后面的依次往后移一格
                     data tem;
                     outfile.seekg((j-2)*sizeof(data)+sizeof(head));
@@ -89,9 +90,8 @@ public:
                 h.num++;
                 outfile.seekp(0);
                 outfile.write(reinterpret_cast<const char *>(&h),sizeof(head));
-                break;
+                return;
             }
-            return;
         }
         if(s1>s3 || s1==s3 && value_<h.to_value){
             outfile.seekp(h.num*sizeof(data)+sizeof(head));
@@ -161,6 +161,7 @@ public:
         head h;
         outfile.seekg(0);
         outfile.read(reinterpret_cast<char *>(&h),sizeof(head));
+        //std::cout<<h.num;
         bool flag=1;
         for(int i=1;i<=h.num;i++){
             data temp;
