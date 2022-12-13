@@ -3,7 +3,7 @@
 #include "bookstore.hpp"
 #include "diary.hpp"
 #include "user.hpp"
-#include "database.hpp"
+#include "databaseplus.hpp"
 using namespace std;
 int main ()
 {
@@ -21,9 +21,9 @@ int main ()
             cin>>index;
             database_.find(index);
         }
-        if(op=="delete"){
-            cin>>index>>value;
-            database_.Delete(index,value);
-        }
+        // if(op=="delete"){
+        //     cin>>index>>value;
+        //     database_.Delete(index,value);
+        // }
     }
 }
