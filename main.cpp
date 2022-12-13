@@ -10,12 +10,16 @@ int main ()
     database database_;
     string index,op;
     int n,value;
+    //int cnt=0;
     cin>>n;
     for(int i=0;i<n;i++){
+        //cnt++;
         cin>>op;
         if(op=="insert"){
             cin>>index>>value;
+            //std::cout<<cnt<<" ******"<<'\n';
             database_.insert(index,value);
+            //cout<<'\n';
         }
         if(op=="find"){
             cin>>index;

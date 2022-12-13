@@ -177,14 +177,18 @@ public:
     }
     void insert(std::string index_,int value_){
         data temp(index_,value_);//完成temp节点的构造
-        std::fstream outfile("database");
+        //std::cout<<"**"<<temp.index<<' '<<temp.value<<"**"<<'\n';
         start st;st=getstart();
         int add_position=find_add_position(temp,st);
+        //std::cout<<add_position<<"***\n";
         head add_pos=gethead(add_position);
         data tem1,tem2;
         bool flag=1;//是否成功插入中间
-        data from(add_pos.from,add_pos.from_value);
+        data from;
+        strcpy(from.index,add_pos.from);
+        from.value=add_pos.from_value;
         if(temp<from){//要插在头的前面的特殊情况。
+            //std::cout<<114514;
             for(int j=add_pos.num+1;j>=2;j--){//后面的依次往后移一格
                 data tem;
                 tem=getdata(add_position,j-1);
@@ -201,12 +205,13 @@ public:
             tem1=getdata(add_position,i);
             tem2=getdata(add_position,i+1);
             if(temp>tem1 && temp<tem2){
-                for(int j=add_pos.num+1;j>=i+1;j--){//后面的依次往后移一格
+                //std::cout<<"**"<<index_<<' '<<value_<<"*****666"<<' '<<i<<'\n';
+                for(int j=add_pos.num+1;j>=i+2;j--){//后面的依次往后移一格
                     data tem;
                     tem=getdata(add_position,j-1);
                     modify_data(add_position,j,tem);
                 }
-                modify_data(add_position,i,temp);
+                modify_data(add_position,i+1,temp);
                 add_pos.num++;
                 modify_head(add_position,add_pos);
                 flag=0;
@@ -218,10 +223,17 @@ public:
             add_pos.num++;//1
             strcpy(add_pos.to,index_.c_str());//2
             add_pos.to_value=value_;//3 改头三步不能忘！改num改from改value
+            if(add_pos.num==1){
+                strcpy(add_pos.from,index_.c_str());
+                add_pos.from_value=value_;
+            }
             modify_head(add_position,add_pos);
         }
-
         if(add_pos.num==316)devide(add_position);
+        // for(int i=1;i<=add_pos.num;i++){
+        //     data temm;temm=getdata(add_position,i);
+        //     std::cout<<temm.index<<' '<<temm.value<<'\n';
+        // }
     }
     void find (std::string index_){
         int i=1;
