@@ -373,7 +373,7 @@ public:
                 for(int j=1;j<=temp.num;j++){
                     data tem;tem=getdata(i,j);
                     std::string s=tem.index;
-                    if(s==index_){
+                    if(s==index_ && tem.value==value_){
                         //把后面的全往前移一格
                         for(int k=j;k<temp.num;k++){
                             data tem_prime;tem_prime=getdata(i,k+1);
