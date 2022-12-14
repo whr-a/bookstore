@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <string.h>
 #include <fstream>
-const int size_of_bolck=4;
+const int size_of_bolck=316;
 class start {
 public:
     int num;
