@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <string.h>
 #include <fstream>
+const int size_of_bolck=4;
 class start {
 public:
     int num;
@@ -59,16 +60,17 @@ public:
     bool operator <=(data &other){return !(*this>other);}
     bool operator ==(data &other){return (!(*this>other) && !(*this<other));}
 };
+
 static head gethead(int num){
     std::fstream opfile("database");
-    opfile.seekg(sizeof(start)+(num-1)*(sizeof(head)+316*sizeof(data)));
+    opfile.seekg(sizeof(start)+(num-1)*(sizeof(head)+size_of_bolck*sizeof(data)));
     head h;
     opfile.read(reinterpret_cast<char *>(&h),sizeof(head));
     return h;
 }
 static data getdata(int head_num,int data_num){
     std::fstream opfile("database");
-    opfile.seekg(sizeof(start)+(head_num-1)*(sizeof(head)+316*sizeof(data))
+    opfile.seekg(sizeof(start)+(head_num-1)*(sizeof(head)+size_of_bolck*sizeof(data))
                     +sizeof(head)+(data_num-1)*sizeof(data));
     data d;
     opfile.read(reinterpret_cast<char *>(&d),sizeof(data));
@@ -85,30 +87,35 @@ static int find_add_position(data temp,start st){
     int add_position;
     if(st.num==1)add_position=1;
     else{
+        // head hh;hh=gethead(1);
+        // std::cout<<hh.from_value<<"-=-=-=-"<<'\n';
+        // head hhh;hhh=gethead(2);
+        // std::cout<<hhh.from_value<<"-=-=-="<<'\n';
         int i=1;
+        head h;
         while(true){
-            head h;
+            //std::cout<<i<<"**--**"<<'\n';
             h=gethead(i);
-            data from(h.from,h.from_value);
-            if(h.next_head_num==0){//找到最后一个块，还比最后一个大
-                if(temp>=from){
-                    add_position=i;
-                    break;
-                }
+            data from;
+            strcpy(from.index,h.from);
+            from.value=h.from_value;
+            if(h.next_head_num==0){//找到最后一个块，则比最后一个大
+                add_position=i;
+                break;
             }
-            else if(h.last_head_num==0){
+            if(h.last_head_num==0){
                 if(temp<from){
                     add_position=i;
                     break;
                 }
             }
-            else{
-                head h_next=gethead(h.next_head_num);
-                data to(h_next.from,h_next.to_value);
-                if(temp>=from && temp<to){
-                    add_position=i;
-                    break;
-                }
+            head h_next;h_next=gethead(h.next_head_num);
+            data to;
+            strcpy(to.index,h_next.from);
+            to.value=h_next.from_value;
+            if(temp>=from && temp<to){
+                add_position=i;
+                break;
             }
             if(h.next_head_num!=0)i=h.next_head_num;
             else break;
@@ -118,13 +125,13 @@ static int find_add_position(data temp,start st){
 }
 static void modify_data(int head_num,int data_num,data data_){
     std::fstream opfile("database");
-    opfile.seekp(sizeof(start)+(head_num-1)*(sizeof(head)+316*sizeof(data))
+    opfile.seekp(sizeof(start)+(head_num-1)*(sizeof(head)+size_of_bolck*sizeof(data))
                     +sizeof(head)+(data_num-1)*sizeof(data));
     opfile.write(reinterpret_cast<char*>(&data_),sizeof(data));
 }
 static void modify_head(int head_num,head head_){
     std::fstream opfile("database");
-    opfile.seekp(sizeof(start)+(head_num-1)*(sizeof(head)+316*sizeof(data)));
+    opfile.seekp(sizeof(start)+(head_num-1)*(sizeof(head)+size_of_bolck*sizeof(data)));
     opfile.write(reinterpret_cast<char*>(&head_),sizeof(head));
 }
 static void modify_start(start st){
@@ -142,24 +149,24 @@ static void devide(int head_num)
     modify_start(st);
     //下面的区块为建造一个新head_
     head head_;
-    data front; front=getdata(head_num,159);
-    data end;   end=getdata(head_num,316);
+    data front; front=getdata(head_num,size_of_bolck/2+1);
+    data end;   end=getdata(head_num,size_of_bolck);
     strcpy(head_.from,front.index);head_.from_value=front.value;
     strcpy(head_.to,end.index);    head_.to_value=end.value;
-    head_num=158;head_.last_head_num=head_num;
-    if(!this_head.next_head_num)head_.next_head_num=this_head.next_head_num;
+    head_.num=size_of_bolck/2;head_.last_head_num=head_num;
+    if(this_head.next_head_num)head_.next_head_num=this_head.next_head_num;
     modify_head(st.max_num_of_block,head_);
     //下面的区块为更新本节点
-    data end_;end_=getdata(head_num,158);
+    data end_;end_=getdata(head_num,size_of_bolck/2);
     strcpy(this_head.to,end_.index);
     this_head.to_value=end_.value;
     this_head.next_head_num=st.max_num_of_block;
-    this_head.num=158;
+    this_head.num=size_of_bolck/2;
     modify_head(head_num,this_head);
     //下面的区块为拷贝元素
     data temp;
-    for(int i=1;i<=158;i++){
-        temp=getdata(head_num,158+i);
+    for(int i=1;i<=size_of_bolck/2;i++){
+        temp=getdata(head_num,size_of_bolck/2+i);
         modify_data(st.max_num_of_block,i,temp);
     }
 }
@@ -171,10 +178,10 @@ static void merge(int head_num)
     head head_;head_=gethead(head_num);
     if(head_.next_head_num!=0){
         head next_head;next_head=gethead(head_.next_head_num);
-        if(next_head.num>158){
+        if(next_head.num>size_of_bolck/2){
             //借一个元素过来
             data next_first_data;next_first_data=getdata(head_.next_head_num,1);
-            modify_data(head_num,158,next_first_data);
+            modify_data(head_num,size_of_bolck/2,next_first_data);
             //修改借后的头
             strcpy(head_.to,next_first_data.index);
             head_.to_value=next_first_data.value;
@@ -197,19 +204,19 @@ static void merge(int head_num)
         else{
             //并块 现在的情况是head里有157个元素，后面的有158个元素
             //先移动data
-            for(int i=1;i<=158;i++){
+            for(int i=1;i<=size_of_bolck/2;i++){
                 data temp;temp=getdata(head_.next_head_num,i);
-                modify_data(head_num,157+i,temp);
+                modify_data(head_num,size_of_bolck/2-1+i,temp);
             }
             //改这个的头
-            head_.num=315;
+            head_.num=size_of_bolck-1;
             head_.next_head_num=next_head.next_head_num;
             if(next_head.next_head_num){
                 head tem;tem=gethead(next_head.next_head_num);
                 tem.last_head_num=head_num;
                 modify_head(next_head.next_head_num,tem);
             }
-            data temp_prime;temp_prime=getdata(head_num,315);
+            data temp_prime;temp_prime=getdata(head_num,size_of_bolck-1);
             strcpy(head_.to,temp_prime.index);
             head_.to_value=temp_prime.value;
             modify_head(head_num,head_);
@@ -222,10 +229,10 @@ static void merge(int head_num)
     }
     else{//后面没有只好往前借
         head last_head;last_head=gethead(head_.last_head_num);
-        if(last_head.num>158){
+        if(last_head.num>size_of_bolck/2){
             //借一个过来
             data temp;
-            for(int i=158;i>=2;i--){
+            for(int i=size_of_bolck/2;i>=2;i--){
                 temp=getdata(head_num,i-1);
                 modify_data(head_num,i,temp);
             }
@@ -248,14 +255,14 @@ static void merge(int head_num)
             //向前并块 目前前面块有158个元素，后面块有157个元素
             //先移动元素
             data temp;
-            for(int i=1;i<=157;i++){
+            for(int i=1;i<=size_of_bolck/2-1;i++){
                 temp=getdata(head_num,i);
-                modify_data(head_.last_head_num,158+i,temp);
+                modify_data(head_.last_head_num,size_of_bolck/2+i,temp);
             }
             //改上一个的头
-            last_head.num=315;
+            last_head.num=size_of_bolck-1;
             last_head.next_head_num=0;
-            temp=getdata(head_.last_head_num,315);
+            temp=getdata(head_.last_head_num,size_of_bolck-1);
             strcpy(last_head.to,temp.index);
             last_head.to_value=temp.value;
             modify_head(head_.last_head_num,last_head);
@@ -266,6 +273,21 @@ static void merge(int head_num)
         }
     }
 }
+static void print()//调试专用
+{
+    int i=1;
+    while(true){
+        head head_;head_=gethead(i);
+        std::cout<<"  "<<i<<"---------------\n";
+        for(int j=1;j<=head_.num;j++){
+            data data_;data_=getdata(i,j);
+            std::cout<<"  "<<data_.index<<' '<<data_.value<<'\n';
+        }
+        if(head_.next_head_num!=0)i=head_.next_head_num;
+        else break;
+    }
+}
+
 class database
 {
 public:
@@ -283,6 +305,7 @@ public:
         //std::cout<<"**"<<temp.index<<' '<<temp.value<<"**"<<'\n';
         start st;st=getstart();
         int add_position=find_add_position(temp,st);
+        //std::cout<<"***"<<add_position<<"***"<<'\n';//==========================
         //std::cout<<add_position<<"***\n";
         head add_pos=gethead(add_position);
         data tem1,tem2;
@@ -332,11 +355,20 @@ public:
             }
             modify_head(add_position,add_pos);
         }
-        if(add_pos.num==316)devide(add_position);
-        // for(int i=1;i<=add_pos.num;i++){
+        if(add_pos.num>=size_of_bolck){
+            devide(add_position);
+            //std::cout<<114514;
+        }
+        //print();
+        // // start stt;stt=getstart();
+        // // std::cout<<"**"<<stt.num<<' '<<stt.max_num_of_block<<"**"<<'\n';
+        // head temmp;temmp=gethead(add_position);
+        // // std::cout<<"==="<<temmp.num<<"==="<<'\n';
+        // std::cout<<"ooooo"<<add_position<<"ooooo"<<'\n';
+        // for(int i=1;i<=temmp.num;i++){
         //     data temm;temm=getdata(add_position,i);
         //     std::cout<<temm.index<<' '<<temm.value<<'\n';
-        // }
+        // }//***********************
     }
     void find (std::string index_){
         int i=1;
@@ -351,7 +383,7 @@ public:
                     data tem;tem=getdata(i,j);
                     std::string s=tem.index;
                     if(s==index_){
-                        std::cout<<tem.value<<' ';
+                        std::cout<<tem.value<<'\n';
                         flag=0;
                     }
                 }
@@ -404,7 +436,7 @@ public:
                         }
                         //先判断是不是只有一个块，只有一个块就返回，否则判断是否小于158，
                         //不小于158则继续，小于则借元素或并块。
-                        if(st.num==1 || temp.num>=158)return;
+                        if(st.num==1 || temp.num>=size_of_bolck/2)return;
                         else{
                             merge(i);
                         }

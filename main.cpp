@@ -10,10 +10,10 @@ int main ()
     database database_;
     string index,op;
     int n,value;
-    //int cnt=0;
+    int cnt=0;
     cin>>n;
     for(int i=0;i<n;i++){
-        //cnt++;
+        cnt++;
         cin>>op;
         if(op=="insert"){
             cin>>index>>value;
@@ -30,4 +30,6 @@ int main ()
             database_.Delete(index,value);
         }
     }
+    // start st;
+    // std::cout<<st.num<<'\n';
 }
