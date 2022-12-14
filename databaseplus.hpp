@@ -383,7 +383,7 @@ public:
                     data tem;tem=getdata(i,j);
                     std::string s=tem.index;
                     if(s==index_){
-                        std::cout<<tem.value<<'\n';
+                        std::cout<<tem.value<<' ';
                         flag=0;
                     }
                 }
