@@ -163,6 +163,109 @@ static void devide(int head_num)
         modify_data(st.max_num_of_block,i,temp);
     }
 }
+static void merge(int head_num)
+{
+//先判断后面有没有块，如果有块，则找后面借，如果后面的块的大小大于158，则借一个元素过来，
+//如果后面的块的大小恰好为158，则并块，改head的num、区间、前驱后继、start的num
+//如果没块，则往前借，同理
+    head head_;head_=gethead(head_num);
+    if(head_.next_head_num!=0){
+        head next_head;next_head=gethead(head_.next_head_num);
+        if(next_head.num>158){
+            //借一个元素过来
+            data next_first_data;next_first_data=getdata(head_.next_head_num,1);
+            modify_data(head_num,158,next_first_data);
+            //修改借后的头
+            strcpy(head_.to,next_first_data.index);
+            head_.to_value=next_first_data.value;
+            head_.num++;
+            modify_head(head_num,head_);
+            //后面的块去头
+            data temp;
+            for(int i=1;i<next_head.num;i++){
+                temp=getdata(head_.next_head_num,i+1);
+                modify_data(head_.next_head_num,i,temp);
+            }
+            //修改后面的头
+            temp=getdata(head_.next_head_num,1);
+            strcpy(next_head.from,temp.index);
+            next_head.from_value=temp.value;
+            next_head.num--;
+            modify_head(head_.next_head_num,next_head);
+            return;
+        }
+        else{
+            //并块 现在的情况是head里有157个元素，后面的有158个元素
+            //先移动data
+            for(int i=1;i<=158;i++){
+                data temp;temp=getdata(head_.next_head_num,i);
+                modify_data(head_num,157+i,temp);
+            }
+            //改这个的头
+            head_.num=315;
+            head_.next_head_num=next_head.next_head_num;
+            if(next_head.next_head_num){
+                head tem;tem=gethead(next_head.next_head_num);
+                tem.last_head_num=head_num;
+                modify_head(next_head.next_head_num,tem);
+            }
+            data temp_prime;temp_prime=getdata(head_num,315);
+            strcpy(head_.to,temp_prime.index);
+            head_.to_value=temp_prime.value;
+            modify_head(head_num,head_);
+            //千万不能忘了改start
+            start st;st=getstart();
+            st.num--;
+            modify_start(st);
+            return;
+        }
+    }
+    else{//后面没有只好往前借
+        head last_head;last_head=gethead(head_.last_head_num);
+        if(last_head.num>158){
+            //借一个过来
+            data temp;
+            for(int i=158;i>=2;i--){
+                temp=getdata(head_num,i-1);
+                modify_data(head_num,i,temp);
+            }
+            temp=getdata(head_.last_head_num,last_head.num);
+            modify_data(head_num,1,temp);
+            //改这个头
+            head_.num++;
+            strcpy(head_.from,temp.index);
+            head_.from_value=temp.value;
+            modify_head(head_num,head_);
+            //改前一个头
+            last_head.num--;
+            temp=getdata(head_.last_head_num,last_head.num);
+            strcpy(last_head.to,temp.index);
+            last_head.to_value=temp.value;
+            modify_head(head_.last_head_num,last_head);
+            return;
+        }
+        else{
+            //向前并块 目前前面块有158个元素，后面块有157个元素
+            //先移动元素
+            data temp;
+            for(int i=1;i<=157;i++){
+                temp=getdata(head_num,i);
+                modify_data(head_.last_head_num,158+i,temp);
+            }
+            //改上一个的头
+            last_head.num=315;
+            last_head.next_head_num=0;
+            temp=getdata(head_.last_head_num,315);
+            strcpy(last_head.to,temp.index);
+            last_head.to_value=temp.value;
+            modify_head(head_.last_head_num,last_head);
+            start st;st=getstart();
+            st.num--;
+            modify_start(st);
+            return;
+        }
+    }
+}
 class database
 {
 public:
@@ -258,6 +361,59 @@ public:
         }
         if(flag)std::cout<<"null";
         std::cout<<'\n';
+    }
+    void Delete (std::string index_,int value_){
+        start st;
+        int i=1;
+        while(true){
+            head temp;temp=gethead(i);
+            std::string s1=temp.from,s2=temp.to;
+            if(s1>index_)return;
+            if(index_>=s1 && index_<=s2){
+                for(int j=1;j<=temp.num;j++){
+                    data tem;tem=getdata(i,j);
+                    std::string s=tem.index;
+                    if(s==index_){
+                        //把后面的全往前移一格
+                        for(int k=j;k<temp.num;k++){
+                            data tem_prime;tem_prime=getdata(i,k+1);
+                            modify_data(i,k,tem_prime);
+                        }
+                        //修改头
+                        if(temp.num==1){
+                            head empty;
+                            modify_head(i,empty);
+                        }//超级极端的情况
+                        if(j==1){//j为1则要改头
+                            data tem_prime;tem_prime=getdata(i,1);
+                            strcpy(temp.from,tem_prime.index);
+                            temp.from_value=tem_prime.value;
+                            temp.num--;
+                            modify_head(i,temp);
+                        }
+                        else if(j==temp.num){//尾
+                            data tem_prime;tem_prime=getdata(i,temp.num-1);
+                            strcpy(temp.to,tem_prime.index);
+                            temp.to_value=tem_prime.value;
+                            temp.num--;
+                            modify_head(i,temp);
+                        }
+                        else{//中间
+                            temp.num--;
+                            modify_head(i,temp);//什么都不用改
+                        }
+                        //先判断是不是只有一个块，只有一个块就返回，否则判断是否小于158，
+                        //不小于158则继续，小于则借元素或并块。
+                        if(st.num==1 || temp.num>=158)return;
+                        else{
+                            merge(i);
+                        }
+                    }
+                }
+            }
+            if(temp.next_head_num!=0)i=temp.next_head_num;
+            else break;
+        }
     }
 };
 

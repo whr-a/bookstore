@@ -27,7 +27,7 @@ int main ()
         }
         if(op=="delete"){
             cin>>index>>value;
-            // database_.Delete(index,value);
+            database_.Delete(index,value);
         }
     }
 }
