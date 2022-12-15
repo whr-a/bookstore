@@ -7,7 +7,7 @@
 #include <string.h>
 #include <fstream>
 const int size_of_block=316;
-static std::fstream opfile("database");
+
 class start {
 public:
     int num;
@@ -72,39 +72,13 @@ public:
     head head_;
     data data_[size_of_block];
 };
-static void getnode(node& temp,int &num){
-    //std::fstream opfile("database");
-    opfile.seekg(sizeof(start)+(num-1)*(sizeof(head)+size_of_block*sizeof(data)));
-    opfile.read(reinterpret_cast<char*>(&temp),sizeof(node));
-    return;
-}
-static void modify_node(int &num,node &node_){
-    //std::fstream opfile("database");
-    opfile.seekp(sizeof(start)+(num-1)*(sizeof(head)+size_of_block*sizeof(data)));
-    opfile.write(reinterpret_cast<char*>(&node_),sizeof(node));
-}
-static head gethead(int &num){
-    //std::fstream opfile("database");
-    opfile.seekg(sizeof(start)+(num-1)*(sizeof(head)+size_of_block*sizeof(data)));
-    head h;
-    opfile.read(reinterpret_cast<char *>(&h),sizeof(head));
-    return h;
-}
-static data getdata(int &head_num,int &data_num){
-    //std::fstream opfile("database");
-    opfile.seekg(sizeof(start)+(head_num-1)*(sizeof(head)+size_of_block*sizeof(data))
-                    +sizeof(head)+(data_num-1)*sizeof(data));
-    data d;
-    opfile.read(reinterpret_cast<char *>(&d),sizeof(data));
-    return d;
-}
-static start getstart(){
-    //std::fstream opfile("database");
-    opfile.seekg(0);
-    start st;
-    opfile.read(reinterpret_cast<char *>(&st),sizeof(start));
-    return st;
-}
+
+static void getnode(node& temp,int &num);
+static void modify_node(int &num,node &node_);
+static head gethead(int &num);
+static data getdata(int &head_num,int &data_num);
+static start getstart();
+
 static int find_add_position(data &temp,start &st){
     int add_position;
     if(st.num==1)add_position=1;
@@ -145,22 +119,11 @@ static int find_add_position(data &temp,start &st){
     }
     return add_position;
 }
-static void modify_data(int &head_num,int &data_num,data &data_){
-    //std::fstream opfile("database");
-    opfile.seekp(sizeof(start)+(head_num-1)*(sizeof(head)+size_of_block*sizeof(data))
-                    +sizeof(head)+(data_num-1)*sizeof(data));
-    opfile.write(reinterpret_cast<char*>(&data_),sizeof(data));
-}
-static void modify_head(int &head_num,head &head_){
-    //std::fstream opfile("database");
-    opfile.seekp(sizeof(start)+(head_num-1)*(sizeof(head)+size_of_block*sizeof(data)));
-    opfile.write(reinterpret_cast<char*>(&head_),sizeof(head));
-}
-static void modify_start(start &st){
-    //std::fstream opfile("database");
-    opfile.seekp(0);
-    opfile.write(reinterpret_cast<char*>(&st),sizeof(start));
-}
+
+static void modify_data(int &head_num,int &data_num,data &data_);
+static void modify_head(int &head_num,head &head_);
+static void modify_start(start &st);
+
 static void devide(int &head_num)
 {
 //裂开一个块，首先到文件最后开一个块，然后把159——316号元素存到这个块里，更新两块的区间
@@ -309,6 +272,7 @@ static bool cmp(data a,data b){
 class database
 {
 public:
+    static std::fstream opfile;
     database(){
         std::ifstream in;
         in.open("database");
@@ -321,6 +285,10 @@ public:
             head h;
             outfile.write(reinterpret_cast<char*>(&h),sizeof(head));
         }
+        opfile.open("database");
+    }
+    ~database(){
+        opfile.close();
     }
     void insert(std::string &index_,int &value_){
         data temp(index_,value_);//完成temp节点的构造
@@ -471,5 +439,54 @@ public:
         }
     }
 };
+static void getnode(node& temp,int &num){
+    //std::fstream opfile("database");
+    database::opfile.seekg(sizeof(start)+(num-1)*(sizeof(head)+size_of_block*sizeof(data)));
+    database::opfile.read(reinterpret_cast<char*>(&temp),sizeof(node));
+    return;
+}
+static void modify_node(int &num,node &node_){
+    //std::fstream opfile("database");
+    database::opfile.seekp(sizeof(start)+(num-1)*(sizeof(head)+size_of_block*sizeof(data)));
+    database::opfile.write(reinterpret_cast<char*>(&node_),sizeof(node));
+}
+static head gethead(int &num){
+    //std::fstream opfile("database");
+    database::opfile.seekg(sizeof(start)+(num-1)*(sizeof(head)+size_of_block*sizeof(data)));
+    head h;
+    database::opfile.read(reinterpret_cast<char *>(&h),sizeof(head));
+    return h;
+}
+static data getdata(int &head_num,int &data_num){
+    //std::fstream opfile("database");
+    database::opfile.seekg(sizeof(start)+(head_num-1)*(sizeof(head)+size_of_block*sizeof(data))
+                    +sizeof(head)+(data_num-1)*sizeof(data));
+    data d;
+    database::opfile.read(reinterpret_cast<char *>(&d),sizeof(data));
+    return d;
+}
+static start getstart(){
+    //std::fstream opfile("database");
+    database::opfile.seekg(0);
+    start st;
+    database::opfile.read(reinterpret_cast<char *>(&st),sizeof(start));
+    return st;
+}
+static void modify_data(int &head_num,int &data_num,data &data_){
+    //std::fstream opfile("database");
+    database::opfile.seekp(sizeof(start)+(head_num-1)*(sizeof(head)+size_of_block*sizeof(data))
+                    +sizeof(head)+(data_num-1)*sizeof(data));
+    database::opfile.write(reinterpret_cast<char*>(&data_),sizeof(data));
+}
+static void modify_head(int &head_num,head &head_){
+    //std::fstream opfile("database");
+    database::opfile.seekp(sizeof(start)+(head_num-1)*(sizeof(head)+size_of_block*sizeof(data)));
+    database::opfile.write(reinterpret_cast<char*>(&head_),sizeof(head));
+}
+static void modify_start(start &st){
+    //std::fstream opfile("database");
+    database::opfile.seekp(0);
+    database::opfile.write(reinterpret_cast<char*>(&st),sizeof(start));
+}
 
 #endif
