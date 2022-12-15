@@ -5,6 +5,7 @@
 #include "user.hpp"
 #include "databaseplus.hpp"
 using namespace std;
+
 int main ()
 {
     ios::sync_with_stdio(false);
