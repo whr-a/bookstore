@@ -282,8 +282,8 @@ public:
             start st;
             outfile.write(reinterpret_cast<char*>(&st),sizeof(start));
             outfile.seekp(sizeof(start));
-            head h;
-            outfile.write(reinterpret_cast<char*>(&h),sizeof(head));
+            node h;
+            outfile.write(reinterpret_cast<char*>(&h),sizeof(node));
         }
         opfile.open("database");
     }
