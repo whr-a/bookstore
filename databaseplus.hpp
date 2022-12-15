@@ -65,12 +65,11 @@ public:
     head head_;
     data data_[size_of_block];
 };
-static node getnode(int num){
+static void getnode(node& temp,int num){
     std::fstream opfile("database");
     opfile.seekg(sizeof(start)+(num-1)*(sizeof(head)+size_of_block*sizeof(data)));
-    node temp;
     opfile.read(reinterpret_cast<char*>(&temp),sizeof(node));
-    return temp;
+    return;
 }
 static void modify_node(int num,node node_){
     std::fstream opfile("database");
@@ -111,7 +110,7 @@ static int find_add_position(data temp,start st){
         node h;
         while(true){
             //std::cout<<i<<"**--**"<<'\n';
-            h=getnode(i);
+            getnode(h,i);
             data from;
             strcpy(from.index,h.head_.from);
             from.value=h.head_.from_value;
@@ -160,7 +159,7 @@ static void devide(int head_num)
 //裂开一个块，首先到文件最后开一个块，然后把159——316号元素存到这个块里，更新两块的区间
 //判断这个块，如果没有后继，则将后继设为这个新块（设置新块的前驱）
 //若有，则更新本块的后继、新块的前驱后继、后继块的前驱
-    node this_head=getnode(head_num);
+    node this_head;getnode(this_head,head_num);
     start st=getstart(); st.num++;st.max_num_of_block++;
     modify_start(st);
     //下面的区块为建造一个新head_(node)
@@ -190,9 +189,9 @@ static void merge(int head_num)
 //先判断后面有没有块，如果有块，则找后面借，如果后面的块的大小大于158，则借一个元素过来，
 //如果后面的块的大小恰好为158，则并块，改head的num、区间、前驱后继、start的num
 //如果没块，则往前借，同理
-    node head_=getnode(head_num);
+    node head_;getnode(head_,head_num);
     if(head_.head_.next_head_num!=0){
-        node next_head=getnode(head_.head_.next_head_num);
+        node next_head;getnode(next_head,head_.head_.next_head_num);
         if(next_head.head_.num>size_of_block/2){
             //借一个元素过来
             data next_first_data=next_head.data_[0];
@@ -240,7 +239,7 @@ static void merge(int head_num)
         }
     }
     else{//后面没有只好往前借
-        node last_head=getnode(head_.head_.last_head_num);
+        node last_head;getnode(last_head,head_.head_.last_head_num);
         if(last_head.head_.num>size_of_block/2){
             //借一个过来
             data temp;
@@ -321,7 +320,7 @@ public:
         int add_position=find_add_position(temp,st);
         //std::cout<<"***"<<add_position<<"***"<<'\n';//==========================
         //std::cout<<add_position<<"***\n";
-        node add_pos=getnode(add_position);
+        node add_pos;getnode(add_pos,add_position);
         data tem1,tem2;
         bool flag=1;//是否成功插入中间
         data from;
@@ -385,7 +384,7 @@ public:
         bool flag=1;
         node temp;
         while(true){
-            temp=getnode(i);
+            getnode(temp,i);
             std::string s1=temp.head_.from,s2=temp.head_.to;
             if(s1>index_)break;
 
@@ -407,7 +406,7 @@ public:
         start st;
         int i=1;
         while(true){
-            node temp;temp=getnode(i);
+            node temp;getnode(temp,i);
             std::string s1=temp.head_.from,s2=temp.head_.to;
             if(s1>index_)return;
             if(index_>=s1 && index_<=s2){
