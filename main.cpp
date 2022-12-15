@@ -21,9 +21,9 @@ int main ()
         cin>>op;
         if(op=="insert"){
             cin>>index>>value;
-            //std::cout<<cnt<<" ******"<<'\n';
+            std::cout<<cnt<<" ******"<<'\n';
             database_.insert(index,value);
-            //cout<<'\n';
+            cout<<'\n';
         }
         if(op=="find"){
             cin>>index;

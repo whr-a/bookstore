@@ -345,7 +345,7 @@ public:
             devide(add_position);
             //std::cout<<114514;
         }
-        //print();
+        print();
         // // start stt;stt=getstart();
         // // std::cout<<"**"<<stt.num<<' '<<stt.max_num_of_block<<"**"<<'\n';
         // head temmp;temmp=gethead(add_position);
@@ -439,6 +439,7 @@ public:
         }
     }
 };
+std::fstream database::opfile;
 static void getnode(node& temp,int &num){
     //std::fstream opfile("database");
     database::opfile.seekg(sizeof(start)+(num-1)*(sizeof(head)+size_of_block*sizeof(data)));
@@ -446,6 +447,7 @@ static void getnode(node& temp,int &num){
     return;
 }
 static void modify_node(int &num,node &node_){
+    // std::cout<<114514;
     //std::fstream opfile("database");
     database::opfile.seekp(sizeof(start)+(num-1)*(sizeof(head)+size_of_block*sizeof(data)));
     database::opfile.write(reinterpret_cast<char*>(&node_),sizeof(node));
