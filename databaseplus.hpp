@@ -292,13 +292,17 @@ class database
 {
 public:
     database(){
-        std::ofstream outfile("database");
-        outfile.seekp(0);
-        start st;
-        outfile.write(reinterpret_cast<char*>(&st),sizeof(start));
-        outfile.seekp(sizeof(start));
-        head h;
-        outfile.write(reinterpret_cast<char*>(&h),sizeof(head));
+        std::ifstream in;
+        in.open("database");
+        if(!in){
+            std::ofstream outfile("database");
+            outfile.seekp(0);
+            start st;
+            outfile.write(reinterpret_cast<char*>(&st),sizeof(start));
+            outfile.seekp(sizeof(start));
+            head h;
+            outfile.write(reinterpret_cast<char*>(&h),sizeof(head));
+        }
     }
     void insert(std::string index_,int value_){
         data temp(index_,value_);//完成temp节点的构造

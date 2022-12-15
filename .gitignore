@@ -8,3 +8,7 @@ database
 Makefile
 my.out
 test.in
+tests.cpp
+MemoryRiver
+right.out
+test.out
