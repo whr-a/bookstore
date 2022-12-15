@@ -392,7 +392,7 @@ public:
             if(index_>=s1 && index_<=s2){
                 for(int j=0;j<temp.head_.num;j++){
                     if(temp.data_[j].index==index_){
-                        std::cout<<temp.data_[j].value<<'\n';
+                        std::cout<<temp.data_[j].value<<' ';
                         flag=0;
                     }
                 }
