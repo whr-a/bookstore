@@ -56,10 +56,15 @@ public:
         strcpy(index,s.c_str());
         value=value_;
     }
-    bool operator >(data &other){return other<*this;}
-    bool operator >=(data &other){return !(*this<other);}
-    bool operator <=(data &other){return !(*this>other);}
-    bool operator ==(data &other){return (!(*this>other) && !(*this<other));}
+    bool operator >(const data &other){
+        int t=strcmp(index,other.index);
+        if(t>0)return true;
+        else if(t==0 && value>other.value)return true;
+        else return false;
+    }
+    bool operator >=(const data &other){return !(*this<other);}
+    bool operator <=(const data &other){return !(*this>other);}
+    bool operator ==(const data &other){return (!(*this>other) && !(*this<other));}
 };
 class node{
 public:
