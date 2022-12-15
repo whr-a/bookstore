@@ -160,7 +160,7 @@ static void devide(int head_num)
 //裂开一个块，首先到文件最后开一个块，然后把159——316号元素存到这个块里，更新两块的区间
 //判断这个块，如果没有后继，则将后继设为这个新块（设置新块的前驱）
 //若有，则更新本块的后继、新块的前驱后继、后继块的前驱
-    node this_head;this_head=getnode(head_num);
+    node this_head=getnode(head_num);
     start st=getstart(); st.num++;st.max_num_of_block++;
     modify_start(st);
     //下面的区块为建造一个新head_(node)
@@ -173,7 +173,7 @@ static void devide(int head_num)
     if(this_head.head_.next_head_num)head_.head_.next_head_num=this_head.head_.next_head_num;
     //modify_head(st.max_num_of_block,head_);
     //下面的区块为更新本节点
-    data end_;end_=head_.data_[size_of_block/2-1];
+    data end_=this_head.data_[size_of_block/2-1];
     strcpy(this_head.head_.to,end_.index);
     this_head.head_.to_value=end_.value;
     this_head.head_.next_head_num=st.max_num_of_block;
@@ -288,6 +288,7 @@ static void print()//调试专用
     while(true){
         head head_;head_=gethead(i);
         std::cout<<"  "<<i<<"---------------\n";
+        std::cout<<"  "<<head_.from_value<<' '<<head_.to_value<<'\n';
         for(int j=1;j<=head_.num;j++){
             data data_;data_=getdata(i,j);
             std::cout<<"  "<<data_.index<<' '<<data_.value<<'\n';
@@ -382,17 +383,16 @@ public:
     void find (std::string index_){
         int i=1;
         bool flag=1;
+        node temp;
         while(true){
-            node temp;temp=getnode(i);
+            temp=getnode(i);
             std::string s1=temp.head_.from,s2=temp.head_.to;
             if(s1>index_)break;
 
             if(index_>=s1 && index_<=s2){
-                for(int j=1;j<=temp.head_.num;j++){
-                    data tem=temp.data_[j-1];
-                    std::string s=tem.index;
-                    if(s==index_){
-                        std::cout<<tem.value<<' ';
+                for(int j=0;j<temp.head_.num;j++){
+                    if(temp.data_[j].index==index_){
+                        std::cout<<temp.data_[j].value<<'\n';
                         flag=0;
                     }
                 }
