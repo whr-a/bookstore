@@ -1,11 +1,12 @@
 #ifndef DATABASEPLUS
 #define DATABASEPLUS
 
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include <string.h>
 #include <fstream>
-const int size_of_block=3160;
+const int size_of_block=316;
 class start {
 public:
     int num;
@@ -296,7 +297,9 @@ static void print()//调试专用
         else break;
     }
 }
-
+static bool cmp(data a,data b){
+    return strcmp(a.index,b.index)<0;
+}
 class database
 {
 public:
@@ -389,11 +392,18 @@ public:
             if(s1>index_)break;
 
             if(index_>=s1 && index_<=s2){
-                for(int j=0;j<temp.head_.num;j++){
-                    if(temp.data_[j].index==index_){
-                        std::cout<<temp.data_[j].value<<' ';
-                        flag=0;
-                    }
+                // for(int j=0;j<temp.head_.num;j++){
+                //     if(temp.data_[j].index==index_){
+                //         std::cout<<temp.data_[j].value<<' ';
+                //         flag=0;
+                //     }
+                // }
+                data t;strcpy(t.index,index_.c_str());
+                int x=std::lower_bound(temp.data_,temp.data_+temp.head_.num,t,cmp)-temp.data_;
+                int y=std::upper_bound(temp.data_,temp.data_+temp.head_.num,t,cmp)-temp.data_;
+                for(int j=x;j<y;j++){
+                    std::cout<<temp.data_[j].value<<' ';
+                    flag=0;
                 }
             }
             if(temp.head_.next_head_num!=0)i=temp.head_.next_head_num;
