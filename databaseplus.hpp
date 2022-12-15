@@ -38,10 +38,10 @@ class data {
 public:
     char index[64];
     int value;
-    bool operator <(data &other){
-        std::string s1=index,s2=other.index;
-        if(s1<s2)return true;
-        else if(s1==s2 && value<other.value)return true;
+    bool operator <(const data &other){
+        int t=strcmp(index,other.index);
+        if(t<0)return true;
+        else if(t==0 && value<other.value)return true;
         else return false;
     }
     data(){
