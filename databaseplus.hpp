@@ -345,7 +345,7 @@ public:
             devide(add_position);
             //std::cout<<114514;
         }
-        print();
+        //print();
         // // start stt;stt=getstart();
         // // std::cout<<"**"<<stt.num<<' '<<stt.max_num_of_block<<"**"<<'\n';
         // head temmp;temmp=gethead(add_position);
