@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <string.h>
 #include <fstream>
-const int size_of_block=316;
+const int size_of_block=1000;
 
 class start {
 public:
@@ -53,10 +53,6 @@ public:
         strcpy(index,s.c_str());
         value=value_;
     }
-    void build(std::string &s,int &value_){
-        strcpy(index,s.c_str());
-        value=value_;
-    }
     bool operator >(const data &other){
         int t=strcmp(index,other.index);
         if(t>0)return true;
@@ -73,13 +69,13 @@ public:
     data data_[size_of_block];
 };
 
-static void getnode(node& temp,int &num);
-static void modify_node(int &num,node &node_);
-static head gethead(int &num);
-static data getdata(int &head_num,int &data_num);
-static start getstart();
+static inline void getnode(node& temp,int &num);
+static inline void modify_node(int &num,node &node_);
+static inline head gethead(int &num);
+static inline data getdata(int &head_num,int &data_num);
+static inline start getstart();
 
-static int find_add_position(data &temp,start &st){
+static inline int find_add_position(data &temp,start &st){
     int add_position;
     if(st.num==1)add_position=1;
     else{
@@ -120,11 +116,11 @@ static int find_add_position(data &temp,start &st){
     return add_position;
 }
 
-static void modify_data(int &head_num,int &data_num,data &data_);
-static void modify_head(int &head_num,head &head_);
-static void modify_start(start &st);
+static inline void modify_data(int &head_num,int &data_num,data &data_);
+static inline void modify_head(int &head_num,head &head_);
+static inline void modify_start(start &st);
 
-static void devide(int &head_num)
+static inline void devide(int &head_num)
 {
 //裂开一个块，首先到文件最后开一个块，然后把159——316号元素存到这个块里，更新两块的区间
 //判断这个块，如果没有后继，则将后继设为这个新块（设置新块的前驱）
@@ -154,7 +150,7 @@ static void devide(int &head_num)
     }
     modify_node(st.max_num_of_block,head_);
 }
-static void merge(int &head_num)
+static inline void merge(int &head_num)
 {
 //先判断后面有没有块，如果有块，则找后面借，如果后面的块的大小大于158，则借一个元素过来，
 //如果后面的块的大小恰好为158，则并块，改head的num、区间、前驱后继、start的num
@@ -251,7 +247,7 @@ static void merge(int &head_num)
         }
     }
 }
-static void print()//调试专用
+static inline void print()//调试专用
 {
     int i=1;
     while(true){
@@ -292,7 +288,7 @@ public:
     ~database(){
         opfile.close();
     }
-    void insert(std::string &index_,int &value_){
+    inline void insert(std::string &index_,int &value_){
         data temp(index_,value_);//完成temp节点的构造
         //std::cout<<"**"<<temp.index<<' '<<temp.value<<"**"<<'\n';
         start st;st=getstart();
@@ -358,7 +354,7 @@ public:
         //     std::cout<<temm.index<<' '<<temm.value<<'\n';
         // }//***********************
     }
-    void find (std::string &index_){
+    inline void find (std::string &index_){
         int i=1;
         bool flag=1;
         node temp;
@@ -388,7 +384,7 @@ public:
         if(flag)std::cout<<"null";
         std::cout<<'\n';
     }
-    void Delete (std::string &index_,int &value_){
+    inline void Delete (std::string &index_,int &value_){
         start st;st=getstart();
         int i=1;
         node tem;getnode(tem,i);
@@ -455,26 +451,26 @@ public:
     }
 };
 std::fstream database::opfile;
-static void getnode(node& temp,int &num){
+static inline void getnode(node& temp,int &num){
     //std::fstream opfile("database");
     database::opfile.seekg(sizeof(start)+(num-1)*(sizeof(head)+size_of_block*sizeof(data)));
     database::opfile.read(reinterpret_cast<char*>(&temp),sizeof(node));
     return;
 }
-static void modify_node(int &num,node &node_){
+static inline void modify_node(int &num,node &node_){
     // std::cout<<114514;
     //std::fstream opfile("database");
     database::opfile.seekp(sizeof(start)+(num-1)*(sizeof(head)+size_of_block*sizeof(data)));
     database::opfile.write(reinterpret_cast<char*>(&node_),sizeof(node));
 }
-static head gethead(int &num){
+static inline head gethead(int &num){
     //std::fstream opfile("database");
     database::opfile.seekg(sizeof(start)+(num-1)*(sizeof(head)+size_of_block*sizeof(data)));
     head h;
     database::opfile.read(reinterpret_cast<char *>(&h),sizeof(head));
     return h;
 }
-static data getdata(int &head_num,int &data_num){
+static inline data getdata(int &head_num,int &data_num){
     //std::fstream opfile("database");
     database::opfile.seekg(sizeof(start)+(head_num-1)*(sizeof(head)+size_of_block*sizeof(data))
                     +sizeof(head)+(data_num-1)*sizeof(data));
@@ -482,25 +478,25 @@ static data getdata(int &head_num,int &data_num){
     database::opfile.read(reinterpret_cast<char *>(&d),sizeof(data));
     return d;
 }
-static start getstart(){
+static inline start getstart(){
     //std::fstream opfile("database");
     database::opfile.seekg(0);
     start st;
     database::opfile.read(reinterpret_cast<char *>(&st),sizeof(start));
     return st;
 }
-static void modify_data(int &head_num,int &data_num,data &data_){
+static inline void modify_data(int &head_num,int &data_num,data &data_){
     //std::fstream opfile("database");
     database::opfile.seekp(sizeof(start)+(head_num-1)*(sizeof(head)+size_of_block*sizeof(data))
                     +sizeof(head)+(data_num-1)*sizeof(data));
     database::opfile.write(reinterpret_cast<char*>(&data_),sizeof(data));
 }
-static void modify_head(int &head_num,head &head_){
+static inline void modify_head(int &head_num,head &head_){
     //std::fstream opfile("database");
     database::opfile.seekp(sizeof(start)+(head_num-1)*(sizeof(head)+size_of_block*sizeof(data)));
     database::opfile.write(reinterpret_cast<char*>(&head_),sizeof(head));
 }
-static void modify_start(start &st){
+static inline void modify_start(start &st){
     //std::fstream opfile("database");
     database::opfile.seekp(0);
     database::opfile.write(reinterpret_cast<char*>(&st),sizeof(start));
