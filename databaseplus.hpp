@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <string.h>
 #include <fstream>
-const int size_of_block=500;
+const int size_of_block=1000;
 
 class start {
 public:
@@ -49,8 +49,8 @@ public:
         memset(index,0,sizeof(index));
         value=0;
     }
-    data(std::string &s,int &value_){
-        strcpy(index,s.c_str());
+    data(char* &s,int &value_){
+        strcpy(index,s);
         value=value_;
     }
     bool operator >(const data &other){
@@ -160,11 +160,11 @@ static inline void merge(int &head_num)
         node next_head;getnode(next_head,head_.head_.next_head_num);
         if(next_head.head_.num>size_of_block/2){
             //借一个元素过来
-            data next_first_data=next_head.data_[0];
-            head_.data_[size_of_block/2-1]=next_first_data;
+            //data next_first_data=next_head.data_[0];
+            head_.data_[size_of_block/2-1]=next_head.data_[0];
             //修改借后的头
-            strcpy(head_.head_.to,next_first_data.index);
-            head_.head_.to_value=next_first_data.value;
+            strcpy(head_.head_.to,next_head.data_[0].index);
+            head_.head_.to_value=next_head.data_[0].value;
             head_.head_.num++;
             modify_node(head_num,head_);
             //后面的块去头
@@ -172,9 +172,9 @@ static inline void merge(int &head_num)
                 next_head.data_[i]=next_head.data_[i+1];
             }
             //修改后面的头
-            data temp=next_head.data_[0];
-            strcpy(next_head.head_.from,temp.index);
-            next_head.head_.from_value=temp.value;
+            //data temp=next_head.data_[0];
+            strcpy(next_head.head_.from,next_head.data_[0].index);
+            next_head.head_.from_value=next_head.data_[0].value;
             next_head.head_.num--;
             modify_node(head_.head_.next_head_num,next_head);
             return;
@@ -193,9 +193,9 @@ static inline void merge(int &head_num)
                 tem.last_head_num=head_num;
                 modify_head(next_head.head_.next_head_num,tem);
             }
-            data temp_prime=head_.data_[size_of_block-2];
-            strcpy(head_.head_.to,temp_prime.index);
-            head_.head_.to_value=temp_prime.value;
+            //data temp_prime=head_.data_[size_of_block-2];
+            strcpy(head_.head_.to,head_.data_[size_of_block-2].index);
+            head_.head_.to_value=head_.data_[size_of_block-2].value;
             modify_node(head_num,head_);
             //千万不能忘了改start
             start st;st=getstart();
@@ -208,7 +208,7 @@ static inline void merge(int &head_num)
         node last_head;getnode(last_head,head_.head_.last_head_num);
         if(last_head.head_.num>size_of_block/2){
             //借一个过来
-            data temp;
+            //data temp;
             for(int i=size_of_block/2-1;i>=1;i--){
                 head_.data_[i]=head_.data_[i-1];
             }
@@ -220,25 +220,25 @@ static inline void merge(int &head_num)
             modify_node(head_num,head_);
             //改前一个头
             last_head.head_.num--;
-            temp=last_head.data_[last_head.head_.num-1];
-            strcpy(last_head.head_.to,temp.index);
-            last_head.head_.to_value=temp.value;
+            //temp=last_head.data_[last_head.head_.num-1];
+            strcpy(last_head.head_.to,last_head.data_[last_head.head_.num-1].index);
+            last_head.head_.to_value=last_head.data_[last_head.head_.num-1].value;
             modify_node(head_.head_.last_head_num,last_head);
             return;
         }
         else{
             //向前并块 目前前面块有158个元素，后面块有157个元素
             //先移动元素
-            data temp;
+            //data temp;
             for(int i=0;i<size_of_block/2-1;i++){
                 last_head.data_[size_of_block/2+i]=head_.data_[i];
             }
             //改上一个的头
             last_head.head_.num=size_of_block-1;
             last_head.head_.next_head_num=0;
-            temp=last_head.data_[size_of_block-2];
-            strcpy(last_head.head_.to,temp.index);
-            last_head.head_.to_value=temp.value;
+            //temp=last_head.data_[size_of_block-2];
+            strcpy(last_head.head_.to,last_head.data_[size_of_block-2].index);
+            last_head.head_.to_value=last_head.data_[size_of_block-2].value;
             modify_node(head_.head_.last_head_num,last_head);
             start st;st=getstart();
             st.num--;
@@ -288,7 +288,7 @@ public:
     ~database(){
         opfile.close();
     }
-    inline void insert(std::string &index_,int &value_){
+    inline void insert(char* index_,int &value_){
         data temp(index_,value_);//完成temp节点的构造
         //std::cout<<"**"<<temp.index<<' '<<temp.value<<"**"<<'\n';
         start st;st=getstart();
@@ -296,7 +296,7 @@ public:
         //std::cout<<"***"<<add_position<<"***"<<'\n';//==========================
         //std::cout<<add_position<<"***\n";
         node add_pos;getnode(add_pos,add_position);
-        data tem1,tem2;
+        //data tem1,tem2;
         bool flag=1;//是否成功插入中间
         data from;
         strcpy(from.index,add_pos.head_.from);
@@ -308,15 +308,13 @@ public:
             }
             add_pos.data_[0]=temp;//添加数据
             add_pos.head_.num++;//1
-            strcpy(add_pos.head_.from,index_.c_str());//2
+            strcpy(add_pos.head_.from,index_);//2
             add_pos.head_.from_value=value_;//3
             modify_node(add_position,add_pos);//修改头
             flag=0;
         }
         if(flag)for(int i=1;i<add_pos.head_.num;i++){//插在中间
-            tem1=add_pos.data_[i-1];
-            tem2=add_pos.data_[i];
-            if(temp>tem1 && temp<tem2){
+            if(temp>add_pos.data_[i-1] && temp<add_pos.data_[i]){
                 //std::cout<<"**"<<index_<<' '<<value_<<"*****666"<<' '<<i<<'\n';
                 for(int j=add_pos.head_.num;j>=i+1;j--){//后面的依次往后移一格
                     add_pos.data_[j]=add_pos.data_[j-1];
@@ -331,10 +329,10 @@ public:
         if(flag){//插于尾部
             add_pos.data_[add_pos.head_.num]=temp;
             add_pos.head_.num++;//1
-            strcpy(add_pos.head_.to,index_.c_str());//2
+            strcpy(add_pos.head_.to,index_);//2
             add_pos.head_.to_value=value_;//3 改头三步不能忘！改num改from改value
             if(add_pos.head_.num==1){
-                strcpy(add_pos.head_.from,index_.c_str());
+                strcpy(add_pos.head_.from,index_);
                 add_pos.head_.from_value=value_;
             }
             modify_node(add_position,add_pos);
@@ -354,23 +352,23 @@ public:
         //     std::cout<<temm.index<<' '<<temm.value<<'\n';
         // }//***********************
     }
-    inline void find (std::string &index_){
+    inline void find (char* index_){
         int i=1;
         bool flag=1;
         node temp;
         while(true){
             getnode(temp,i);
-            std::string s1=temp.head_.from,s2=temp.head_.to;
-            if(s1>index_)break;
-
-            if(index_>=s1 && index_<=s2){
+            //std::string s1=temp.head_.from,s2=temp.head_.to;
+            if(strcmp(temp.head_.from,index_)>0)break;
+            if(strcmp(index_,temp.head_.from)>=0 && strcmp(index_,temp.head_.to)<=0){
+            //if(index_>=s1 && index_<=s2){
                 // for(int j=0;j<temp.head_.num;j++){
                 //     if(temp.data_[j].index==index_){
                 //         std::cout<<temp.data_[j].value<<' ';
                 //         flag=0;
                 //     }
                 // }
-                data t;strcpy(t.index,index_.c_str());
+                data t;strcpy(t.index,index_);
                 int x=std::lower_bound(temp.data_,temp.data_+temp.head_.num,t,cmp)-temp.data_;
                 int y=std::upper_bound(temp.data_,temp.data_+temp.head_.num,t,cmp)-temp.data_;
                 for(int j=x;j<y;j++){
@@ -384,20 +382,23 @@ public:
         if(flag)std::cout<<"null";
         std::cout<<'\n';
     }
-    inline void Delete (std::string &index_,int &value_){
+    inline void Delete (char* index_,int &value_){
         start st;st=getstart();
         int i=1;
         node tem;getnode(tem,i);
         if(st.num==1 && tem.head_.num==0)return;
         while(true){
             node temp;getnode(temp,i);
-            std::string s1=temp.head_.from,s2=temp.head_.to;
-            if(s1>index_)return;
-            if(index_>=s1 && index_<=s2){
+            //std::string s1=temp.head_.from,s2=temp.head_.to;
+            //if(s1>index_)return;
+            if(strcmp(temp.head_.from,index_)>0)return;
+            if(strcmp(index_,temp.head_.from)>=0 && strcmp(index_,temp.head_.to)<=0){
+            //if(index_>=s1 && index_<=s2){
                 for(int j=0;j<temp.head_.num;j++){
-                    data tem=temp.data_[j];
-                    std::string s=tem.index;
-                    if(s==index_ && tem.value==value_){
+                    //data tem=temp.data_[j];
+                    //std::string s=tem.index;
+                    if(strcmp(temp.data_[j].index,index_)==0 &&temp.data_[j].value==value_){
+                    //if(s==index_ && tem.value==value_){
                         //把后面的全往前移一格
                         for(int k=j;k<temp.head_.num-1;k++){
                             temp.data_[k]=temp.data_[k+1];
@@ -411,16 +412,16 @@ public:
                             return;
                         }//超级极端的情况
                         if(j==0){//j为1则要改头
-                            data tem_prime=temp.data_[0];
-                            strcpy(temp.head_.from,tem_prime.index);
-                            temp.head_.from_value=tem_prime.value;
+                            //data tem_prime=temp.data_[0];
+                            strcpy(temp.head_.from,temp.data_[0].index);
+                            temp.head_.from_value=temp.data_[0].value;
                             temp.head_.num--;
                             modify_node(i,temp);
                         }
                         else if(j==temp.head_.num-1){//尾
-                            data tem_prime=temp.data_[j-1];
-                            strcpy(temp.head_.to,tem_prime.index);
-                            temp.head_.to_value=tem_prime.value;
+                            //data tem_prime=temp.data_[j-1];
+                            strcpy(temp.head_.to,temp.data_[j-1].index);
+                            temp.head_.to_value=temp.data_[j-1].value;
                             temp.head_.num--;
                             modify_node(i,temp);
                         }

@@ -12,7 +12,8 @@ int main ()
     cin.tie(nullptr);
     cout.tie(nullptr);
     database database_;
-    string index,op;
+    char index[64];
+    string op;
     int n,value;
     int cnt=0;
     cin>>n;
