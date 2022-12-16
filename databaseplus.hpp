@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <string.h>
 #include <fstream>
-const int size_of_block=300;
+const int size_of_block=316;
 
 class start {
 public:
@@ -20,12 +20,12 @@ public:
 class head {
 public:
     char from[64];
-    int from_value;
+    int from_value=0;
     char to[64];
-    int to_value;
+    int to_value=0;
     int num=0;
-    int next_head_num;
-    int last_head_num;
+    int next_head_num=0;
+    int last_head_num=0;
     head(){
         memset(from,0,sizeof(from));
         memset(to,0,sizeof(to));
@@ -257,7 +257,7 @@ static void print()//调试专用
     while(true){
         head head_;head_=gethead(i);
         std::cout<<"  "<<i<<"---------------\n";
-        std::cout<<"  "<<head_.from_value<<' '<<head_.to_value<<'\n';
+        std::cout<<"  "<<head_.from_value<<' '<<head_.to_value<<' '<<head_.num<<'\n';
         for(int j=1;j<=head_.num;j++){
             data data_;data_=getdata(i,j);
             std::cout<<"  "<<data_.index<<' '<<data_.value<<'\n';
@@ -265,6 +265,8 @@ static void print()//调试专用
         if(head_.next_head_num!=0)i=head_.next_head_num;
         else break;
     }
+    start st;st=getstart();
+    std::cout<<"st.num:"<<st.num;
 }
 static bool cmp(data a,data b){
     return strcmp(a.index,b.index)<0;
@@ -387,7 +389,7 @@ public:
         std::cout<<'\n';
     }
     void Delete (std::string &index_,int &value_){
-        start st;
+        start st;st=getstart();
         int i=1;
         while(true){
             node temp;getnode(temp,i);
@@ -406,6 +408,9 @@ public:
                         if(temp.head_.num==1){
                             head empty;
                             temp.head_=empty;
+                            modify_node(i,temp);
+                            //print();
+                            return;
                         }//超级极端的情况
                         if(j==0){//j为1则要改头
                             data tem_prime=temp.data_[0];
@@ -427,9 +432,17 @@ public:
                         }
                         //先判断是不是只有一个块，只有一个块就返回，否则判断是否小于158，
                         //不小于158则继续，小于则借元素或并块。
-                        if(st.num==1 || temp.head_.num>=size_of_block/2)return;
+                        //std::cout<<temp.head_.num<<"  "<<st.num<<"=-=-==-\n";
+                        if(st.num==1 || temp.head_.num>=size_of_block/2){
+                            //std::cout<<114514;
+                            //print();
+                            return;
+                        }
                         else{
+                            //std::cout<<1111111111;
                             merge(i);
+                            //print();
+                            return;
                         }
                     }
                 }

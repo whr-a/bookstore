@@ -31,7 +31,9 @@ int main ()
         }
         if(op=="delete"){
             cin>>index>>value;
+            //std::cout<<cnt<<" ******"<<'\n';
             database_.Delete(index,value);
+            //cout<<'\n';
         }
     }
     // start st;
