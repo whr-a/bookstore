@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <string.h>
 #include <fstream>
-const int size_of_block=3000;
+const int size_of_block=500;
 
 class start {
 public:
