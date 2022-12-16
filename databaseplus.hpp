@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <string.h>
 #include <fstream>
-const int size_of_block=316;
+const int size_of_block=4;
 
 class start {
 public:
@@ -391,6 +391,8 @@ public:
     void Delete (std::string &index_,int &value_){
         start st;st=getstart();
         int i=1;
+        node tem;getnode(tem,i);
+        if(st.num==1 && tem.head_.num==0)return;
         while(true){
             node temp;getnode(temp,i);
             std::string s1=temp.head_.from,s2=temp.head_.to;
@@ -420,7 +422,7 @@ public:
                             modify_node(i,temp);
                         }
                         else if(j==temp.head_.num-1){//尾
-                            data tem_prime=temp.data_[j];
+                            data tem_prime=temp.data_[j-1];
                             strcpy(temp.head_.to,tem_prime.index);
                             temp.head_.to_value=tem_prime.value;
                             temp.head_.num--;
