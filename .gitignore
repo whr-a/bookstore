@@ -16,3 +16,5 @@ test.out
 111.out
 data
 rand
+main_prime.cpp
+perf.svg
