@@ -96,11 +96,12 @@ class database
 {
 public:
     static std::fstream opfile;
-    database(){
+    database(){}
+    database(std::string name){
         std::ifstream in;
-        in.open("database");
+        in.open(name);
         if(!in){
-            std::ofstream outfile("database");
+            std::ofstream outfile(name);
             outfile.seekp(0);
             start st;
             outfile.write(reinterpret_cast<char*>(&st),sizeof(start));
@@ -108,8 +109,26 @@ public:
             node<T> h;
             outfile.write(reinterpret_cast<char*>(&h),sizeof(node<T>));
         }
-        opfile.open("database");
+        opfile.open(name);
     }
+    bool setfile(std::string name){
+        std::ifstream in;
+        in.open(name);
+        bool flag=1;
+        if(!in){
+            flag=0;
+            std::ofstream outfile(name);
+            outfile.seekp(0);
+            start st;
+            outfile.write(reinterpret_cast<char*>(&st),sizeof(start));
+            outfile.seekp(sizeof(start));
+            node<T> h;
+            outfile.write(reinterpret_cast<char*>(&h),sizeof(node<T>));
+        }
+        opfile.open(name);
+        return flag;
+    }
+
     ~database(){
         opfile.close();
     }
@@ -332,7 +351,7 @@ public:
             }
         }
     }
-    inline void insert(char* index_,int &value_){
+    inline void insert(char* index_,T &value_){
         data<T> temp(index_,value_);//完成temp节点的构造
         //std::cout<<"**"<<temp.index<<' '<<temp.value<<"**"<<'\n';
         start st;st=getstart();
@@ -396,10 +415,11 @@ public:
         //     std::cout<<temm.index<<' '<<temm.value<<'\n';
         // }//***********************
     }
-    inline void find (char* index_){
+    inline std::pair<T,bool> find (char* index_){
         int i=1;
-        bool flag=1;
+        bool flag=0;
         node<T> temp;
+        T ans;
         while(true){
             getnode(temp,i);
             //std::string s1=temp.head_.from,s2=temp.head_.to;
@@ -416,17 +436,18 @@ public:
                 int x=std::lower_bound(temp.data_,temp.data_+temp.head_.num,t,cmp<T>)-temp.data_;
                 int y=std::upper_bound(temp.data_,temp.data_+temp.head_.num,t,cmp<T>)-temp.data_;
                 for(int j=x;j<y;j++){
-                    std::cout<<temp.data_[j].value<<' ';
-                    flag=0;
+                    ans=temp.data_[j].value;
+                    flag=1;
+                    break;
                 }
             }
+            if(flag)break;
             if(temp.head_.next_head_num!=0)i=temp.head_.next_head_num;
             else break;
         }
-        if(flag)std::cout<<"null";
-        std::cout<<'\n';
+        return std::make_pair(ans,flag);
     }
-    inline void Delete (char* index_,int &value_){
+    inline void Delete (char* index_,T &value_){
         start st;st=getstart();
         int i=1;
         node<T> tem;getnode(tem,i);

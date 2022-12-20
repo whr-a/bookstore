@@ -4,6 +4,10 @@ project(code)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(code
-        main_prime.cpp
+        main.cpp
         databaseplus.hpp
+        user.hpp
+        user.cpp
+        error.hpp
+        Tokenscanner.hpp
         )
