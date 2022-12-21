@@ -42,6 +42,18 @@ public:
         else cur++;
         return line.substr(i,cur-i-1);
     }
+    std::string nextToken_separate_plus(){
+        int i=cur;
+        if(line[cur]=='\0' || line[cur]!='\"')return "";
+        i++;cur++;
+        while(line[cur]!='\"'){
+            if(line[cur]=='\0' || line[cur]==' ')return "";
+            else cur++;
+        }
+        cur++;
+        if(line[cur]!=' '&&line[cur]!='\0')return "";
+        return line.substr(i,cur-i-1);
+    }
     //0为数字，字母，下划线
     //1为除不可见字符以外 ASCII 字符
     //2为数字
@@ -105,15 +117,15 @@ public:
         return (x>='0'&&x<='9');
     }
     double check_double(std::string &s){
-        if(s.size()<=3 || s.size()>13)return -1.00;
-        if(s[s.size()-3]!='.')return -1.00;
-        double ans=0;
-        for(int i=0;i<s.size()-3;i++){
-            if(!is_num(s[i]))return -1.00;
-            else ans=ans*10+s[i]-'0';
+        if(s.size()==0 || s.size()>13)return -1.00;
+        bool flag=0;
+        if(s[0]=='.'||s[s.size()-1]=='.')return -1.00;
+        for(int i=0;i<s.size();i++){
+            if(s[i]>='0' && s[i]<='9')continue;
+            if(s[i]=='.'&& flag==0)flag=1;
+            else return -1.00;
         }
-        if(!(is_num(s[s.size()-2])&&is_num(s[s.size()-1])))return -1.00;
-        ans+=(s[s.size()-2]-'0')*0.1+(s[s.size()-1]-'0')*0.01;
+        double ans=std::stod(s);
         return ans;
     }
 };

@@ -23,7 +23,7 @@ int main ()
         processLine(input,users,books);
         if(users.checkquit())return 0;
     } catch (error &ex) {
-        std::cout << ex.toString();
+        std::cout << ex.toString() << std::endl;
     }
   }
 }
@@ -39,7 +39,12 @@ void processLine(std::string &line,user &users,book &books) {
     else if(s=="useradd")users.useradd(scanner);
     else if(s=="delete")users.deleteuser(scanner);
     else if(s=="exit"||s=="quit"){users.quit();}
-    else throw(error("Invalid\n"));
+    else if(s=="show")books.show(scanner,users);
+    else if(s=="buy")books.buy(scanner,users);
+    else if(s=="select")books.select(scanner, users);
+    else if(s=="modify")books.modify(scanner,users);
+    else if(s=="import")books.import(scanner,users);
+    else throw(error("Invalid"));
 }
 // # 基础指令
 // quit

@@ -15,7 +15,13 @@ public:
     char keyword[60];
     int store;
     double price;
-    book_inf(){store=0;price=0;}
+    book_inf(){
+        memset(ISBN,0,sizeof(ISBN));
+        memset(bookname,0,sizeof(bookname));
+        memset(author,0,sizeof(author));
+        memset(keyword,0,sizeof(keyword));
+        store=0;price=0;
+    }
     book_inf(const char* ISBN_,const char* bookname_,const char* author_,const char* keyword_){
         strcpy(ISBN,ISBN_);
         strcpy(bookname,bookname_);
@@ -29,6 +35,8 @@ public:
         strcpy(bookname,obj.bookname);
         strcpy(author,obj.author);
         strcpy(keyword,obj.keyword);
+        store=obj.store;
+        price=obj.price;
         return *this;
     }
     friend bool operator<(const book_inf &a,const book_inf &b){return strcmp(a.ISBN,b.ISBN)<0;}
