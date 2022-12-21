@@ -67,9 +67,8 @@ void user::passwd(Tokenscanner &scanner){
             char index_[30];strcpy(index_,userid.c_str());
             std::pair<account,bool> result=users.find(index_);
             if(result.second){
-                users.Delete(index_,result.first);
                 strcpy(result.first.password,CurrentPassword.c_str());
-                users.insert(index_,result.first);
+                users.modify(index_,result.first);
                 //std::cout<<"passwd successfully"<<'\n';//**********
                 return;
             }
@@ -83,9 +82,8 @@ void user::passwd(Tokenscanner &scanner){
     std::pair<account,bool> result=users.find(index_);
     if(result.second){
         if(strcmp(result.first.password,CurrentPassword.c_str())==0){
-            users.Delete(index_,result.first);
             strcpy(result.first.password,NewPassword.c_str());
-            users.insert(index_,result.first);
+            users.modify(index_,result.first);
             //std::cout<<"passwd successfully"<<'\n';//**********
         }
         else throw(error("Invalid\n"));
@@ -93,7 +91,7 @@ void user::passwd(Tokenscanner &scanner){
     else throw(error("Invalid\n"));
 }
 
-void user::useradd(Tokenscanner &scanner){//可能创建权限为0的账户
+void user::useradd(Tokenscanner &scanner){
     //正确性判断
     if(login_stack.empty())throw(error("Invalid\n"));
     else if(login_stack.back().privilege<3)throw(error("Invalid\n"));

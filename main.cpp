@@ -1,39 +1,39 @@
 #include <iostream>
 #include "Tokenscanner.hpp"
 #include "book.hpp"
-#include "bookstore.hpp"
 #include "diary.hpp"
 #include "user.hpp"
 #include "databaseplus.hpp"
 #include "error.hpp"
 
-void processLine(std::string &line,user &users);
+void processLine(std::string &line,user &users,book &books);
 int main ()
 {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     std::cout.tie(nullptr);
     user users;
+    book books;
     while (true) {
     try {
         std::string input;
         getline(std::cin, input);
         if (input.empty())
             return 0;
-        processLine(input,users);
+        processLine(input,users,books);
         if(users.checkquit())return 0;
     } catch (error &ex) {
         std::cout << ex.toString();
     }
   }
 }
-void processLine(std::string &line,user &users) {
+void processLine(std::string &line,user &users,book &books) {
     Tokenscanner scanner;
     scanner.setInput(line);
     std::string s=scanner.nextToken();
     if(s.empty())return;
-    if(s=="su")users.su(scanner);
-    else if(s=="logout")users.logout();
+    if(s=="su"){users.su(scanner);books.login();}
+    else if(s=="logout"){users.logout();books.logout();}
     else if(s=="register")users.Register(scanner);
     else if(s=="passwd")users.passwd(scanner);
     else if(s=="useradd")users.useradd(scanner);

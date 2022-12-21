@@ -20,12 +20,12 @@ public:
         privilege=privilege_;
         strcpy(name,name_);
     }
-    account(const char* ID_,const char* &password_,const int &privilege_,const char* &name_){
-        strcpy(ID,ID_);
-        strcpy(password,password_);
-        privilege=privilege_;
-        strcpy(name,name_);
-    }
+    // account(const char* ID_,const char* &password_,const int &privilege_,const char* &name_){
+    //     strcpy(ID,ID_);
+    //     strcpy(password,password_);
+    //     privilege=privilege_;
+    //     strcpy(name,name_);
+    // }
     account &operator= (const account &obj){
         strcpy(ID,obj.ID);
         strcpy(password,obj.password);
@@ -41,12 +41,10 @@ public:
 };
 class user
 {
-private:
+public:
     database<account> users;
     std::vector<account> login_stack;
     bool exit;
-    //std::vector<>
-public:
     user(){
         exit=0;
         bool flag=users.setfile("accounts");

@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <string.h>
 #include <fstream>
+#include <vector>
 const int size_of_block=316;
 
 class start {
@@ -515,6 +516,39 @@ public:
             else break;
         }
     }
+    inline bool modify(char* index_,T change_to){
+        int i=1;
+        bool flag=0;
+        node<T> temp;
+        T ans;
+        while(true){
+            getnode(temp,i);
+            //std::string s1=temp.head_.from,s2=temp.head_.to;
+            if(strcmp(temp.head_.from,index_)>0)break;
+            if(strcmp(index_,temp.head_.from)>=0 && strcmp(index_,temp.head_.to)<=0){
+            //if(index_>=s1 && index_<=s2){
+                // for(int j=0;j<temp.head_.num;j++){
+                //     if(temp.data_[j].index==index_){
+                //         std::cout<<temp.data_[j].value<<' ';
+                //         flag=0;
+                //     }
+                // }
+                data<T> t;strcpy(t.index,index_);
+                int x=std::lower_bound(temp.data_,temp.data_+temp.head_.num,t,cmp<T>)-temp.data_;
+                if(strcmp(t.index,temp.data_[x].index)==0){
+                    temp.data_[x].value=change_to;
+                    modify_node(i,temp);
+                    flag=1;
+                }
+            }
+            if(flag)break;
+            if(temp.head_.next_head_num!=0)i=temp.head_.next_head_num;
+            else break;
+        }
+        if(flag)return true;
+        else return false;
+    }
+
 };
 template <class T>
 std::fstream database<T>::opfile;
