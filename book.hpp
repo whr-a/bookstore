@@ -7,12 +7,13 @@
 #include "Tokenscanner.hpp"
 #include "user.hpp"
 #include "error.hpp"
+#include "diary.hpp"
 class book_inf{
 public:
-    char ISBN[20];
-    char bookname[60];
-    char author[60];
-    char keyword[60];
+    char ISBN[21];
+    char bookname[61];
+    char author[61];
+    char keyword[61];
     int store;
     double price;
     book_inf(){
@@ -82,10 +83,10 @@ public:
     void login();
     void logout();
     void show(Tokenscanner &scanner,user &users);
-    void buy(Tokenscanner &scanner,user &users);
+    void buy(Tokenscanner &scanner,user &users,diary &diarys);
     void select(Tokenscanner &scanner,user &users);
     void modify(Tokenscanner &scanner,user &users);
-    void import(Tokenscanner &scanner,user &users);
+    void import(Tokenscanner &scanner,user &users,diary &diarys);
 };
 
 #endif

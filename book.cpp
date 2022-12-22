@@ -1,5 +1,6 @@
 #include "book.hpp"
 #include <iomanip>
+
 void print(book_inf &x){
     std::cout<<x.ISBN<<'\t'
              <<x.bookname<<'\t'
@@ -39,7 +40,7 @@ void book::show(Tokenscanner &scanner,user &users){
             std::string ISBN_=scanner.nextToken();
             if(!scanner.check(ISBN_,20,1))throw(error("Invalid"));
             if(scanner.haveMoreTokens())throw(error("Invalid"));
-            char index[20];strcpy(index,ISBN_.c_str());
+            char index[21];strcpy(index,ISBN_.c_str());
             std::pair<book_inf,bool> result=books.find(index);
             if(result.second){
                 print(result.first);
@@ -105,7 +106,7 @@ void book::show(Tokenscanner &scanner,user &users){
         if(!flag)std::cout<<std::endl;
     }
 }
-void book::buy(Tokenscanner &scanner,user &users){
+void book::buy(Tokenscanner &scanner,user &users,diary &diarys){
     //检查正确性
     if(users.login_stack.empty())throw(error("Invalid"));
     std::string ISBN_;
@@ -115,14 +116,15 @@ void book::buy(Tokenscanner &scanner,user &users){
     int num=scanner.check_num(num_);
     if(num==-1)throw(error("Invalid"));
     if(scanner.haveMoreTokens())throw(error("Invalid"));
-    char index[20];strcpy(index,ISBN_.c_str());
+    char index[21];strcpy(index,ISBN_.c_str());
     std::pair<book_inf,bool> result=books.find(index);
     if(!result.second)throw(error("Invalid"));
     book_inf &t=result.first;
     if(t.store<num)throw(error("Invalid"));
     //操作
     double ans=t.price*num;
-    std::cout<<ans<<'\n';
+    std::cout<<setiosflags(std::ios::fixed)<<std::setprecision(2)<<ans<<std::endl;
+    diarys.add(ans);
     t.store-=num;
     books.modify(index,t);
 }
@@ -134,7 +136,7 @@ void book::select(Tokenscanner &scanner,user &users){
     ISBN_=scanner.nextToken();
     if(!scanner.check(ISBN_,20,1))throw(error("Invalid"));
     if(scanner.haveMoreTokens())throw(error("Invalid"));
-    char index[20];strcpy(index,ISBN_.c_str());
+    char index[21];strcpy(index,ISBN_.c_str());
     std::pair<book_inf,bool> result=books.find(index);
     if(!result.second){
         book_inf temp;strcpy(temp.ISBN,index);
@@ -153,7 +155,7 @@ void book::modify(Tokenscanner &scanner,user &users){
     if(users.login_stack.back().privilege<3)throw(error("Invalid"));
     if(!scanner.haveMoreTokens())throw(error("Invalid"));
     if(book_stack.back()=="")throw(error("Invalid"));
-    char index[20];strcpy(index,book_stack.back().c_str());
+    char index[21];strcpy(index,book_stack.back().c_str());
     std::pair<book_inf,bool> result=books.find(index);
     book_inf tmp=result.first;
     book_inf &t=result.first;
@@ -206,6 +208,9 @@ void book::modify(Tokenscanner &scanner,user &users){
         books.modify(index,t);
     }
     else{
+        char index_[21];strcpy(index_,t.ISBN);
+        std::pair<book_inf,bool> result=books.find(index_);
+        if(result.second)throw(error("Invalid"));
         books.Delete(index,tmp);
         books.insert(t.ISBN,t);
         std::string tep=index;
@@ -218,7 +223,7 @@ void book::modify(Tokenscanner &scanner,user &users){
     }
 }
 
-void book::import(Tokenscanner &scanner,user &users){
+void book::import(Tokenscanner &scanner,user &users,diary &diarys){
     if(users.login_stack.empty())throw(error("Invalid"));
     if(users.login_stack.back().privilege<3)throw(error("Invalid"));
     if(book_stack.back()=="")throw(error("Invalid"));
@@ -228,7 +233,8 @@ void book::import(Tokenscanner &scanner,user &users){
     std::string totalcost_=scanner.nextToken();
     double totalcost=scanner.check_double(totalcost_);
     if(totalcost<=0)throw(error("Invalid"));
-    char index[20];strcpy(index,book_stack.back().c_str());
+    diarys.add(0-totalcost);
+    char index[21];strcpy(index,book_stack.back().c_str());
     std::pair<book_inf,bool> result=books.find(index);
     result.first.store+=quantity;
     books.modify(index,result.first);

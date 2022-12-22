@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(code
         main.cpp
+        database.hpp
         databaseplus.hpp
         user.hpp
         user.cpp
@@ -12,4 +13,5 @@ add_executable(code
         Tokenscanner.hpp
         book.cpp
         book.hpp
+        diary.hpp
         )

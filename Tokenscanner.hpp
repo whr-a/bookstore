@@ -26,6 +26,14 @@ public:
         while(line[cur]!=' ' && line[cur]!='\0'){cur++;}
         return line.substr(i,cur-i);
     }
+    std::string see_nextToken(){
+        int i=cur;
+        int j=cur;
+        if(line[j]=='\0')return "";
+        while(line[j]==' '){i++;j++;}
+        while(line[j]!=' ' && line[j]!='\0'){j++;}
+        return line.substr(i,j-i);
+    }
     bool haveMoreTokens(){
         while(line[cur]==' ')cur++;
         if(line[cur]=='\0')return false;
@@ -86,6 +94,7 @@ public:
     int check_num(std::string &s){
         if(s.size()==0 || s.size()>10)return -1;
         if(s.size()==10 && s>"2147483647")return -1;
+        if(s[0]=='0' && s.size()>1)return -1;
         int ans=0;
         for(int i=0;i<s.size();i++){
             if(s[i]>='0' && s[i]<='9')ans=ans*10+s[i]-'0';
@@ -94,7 +103,17 @@ public:
         if(ans==0)return -1;
         else return ans;
     }
-    
+    int check_num_(std::string &s){
+        if(s.size()==0 || s.size()>10)return -1;
+        if(s.size()==10 && s>"2147483647")return -1;
+        if(s[0]=='0' && s.size()>1)return -1;
+        int ans=0;
+        for(int i=0;i<s.size();i++){
+            if(s[i]>='0' && s[i]<='9')ans=ans*10+s[i]-'0';
+            else return -1;
+        }
+        return ans;
+    }
     bool check_keyword(std::string &s){
         std::string temp;
         std::vector<std::string> line;
@@ -126,6 +145,31 @@ public:
             else return -1.00;
         }
         double ans=std::stod(s);
+        if(ans!=0 &&s[0]=='0' && flag==0)return -1.00;
+        if(ans!=0){
+            if(ans<1){
+                if(s[1]=='.')return ans;
+                else return -1.00;
+            }
+            else{
+                if(s[0]=='0')return -1.00;
+                else return ans;
+            }
+        }
+        if(ans==0){
+            if(flag==0){
+                if(s.size()>1)return -1.00;
+                else return 0.00;
+            }
+            else{
+                int i=s.size()-1;
+                do{
+                    i--;
+                }while(s[i]!='.');
+                if(i>=2)return -1.00;
+                else return 0.00;
+            }
+        }
         return ans;
     }
 };

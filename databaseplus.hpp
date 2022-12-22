@@ -520,7 +520,6 @@ public:
         int i=1;
         bool flag=0;
         node<T> temp;
-        T ans;
         while(true){
             getnode(temp,i);
             //std::string s1=temp.head_.from,s2=temp.head_.to;
@@ -548,7 +547,29 @@ public:
         if(flag)return true;
         else return false;
     }
-
+    inline std::vector<T> search(char* index){
+        std::vector<T> ans;
+        int i=1;
+        bool flag=0;
+        node<T> temp;
+        while(true){
+            getnode(temp,i);
+            if(flag){
+                for(int k=0;k<temp.head_.num;k++)ans.push_back(temp.data_[k].value);
+            }
+            else if(strcmp(index,temp.head_.from)>=0 && strcmp(index,temp.head_.to)<=0){
+                data<T> t;strcpy(t.index,index);
+                int x=std::lower_bound(temp.data_,temp.data_+temp.head_.num,t,cmp<T>)-temp.data_;
+                if(strcmp(t.index,temp.data_[x].index)==0){
+                    flag=1;
+                    for(int k=x;k<temp.head_.num;k++)ans.push_back(temp.data_[k].value);
+                }
+            }
+            if(temp.head_.next_head_num!=0)i=temp.head_.next_head_num;
+            else break;
+        }
+        return ans;
+    }
 };
 template <class T>
 std::fstream database<T>::opfile;

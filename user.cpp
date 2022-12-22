@@ -10,7 +10,9 @@ void user::su(Tokenscanner &scanner){
     std::pair<account,bool> result=users.find(index_);
     if(result.second==0)throw(error("Invalid"));
     account &t=result.first;
+    //std::cout<<t.password<<' '<<in_password<<std::endl;
     if(!in_password.empty()){
+        if(!scanner.check(in_password,30,0))throw(error("Invalid"));
         if(strcmp(in_password.c_str(),t.password)==0){
             login_stack.push_back(t);
             //std::cout<<"su successfully"<<'\n';//**********
@@ -43,7 +45,7 @@ void user::Register(Tokenscanner &scanner){
     std::string username=scanner.nextToken();
     if(!scanner.check(username,30,1))throw(error("Invalid"));
     if(scanner.haveMoreTokens())throw(error("Invalid"));
-    char index_[30];strcpy(index_,userid.c_str());
+    char index_[31];strcpy(index_,userid.c_str());
     std::pair<account,bool> result=users.find(index_);
     if(result.second)throw(error("Invalid"));
     strcpy(temp.ID,userid.c_str());
@@ -64,7 +66,7 @@ void user::passwd(Tokenscanner &scanner){
     if(!scanner.haveMoreTokens()){
         account &cur_account=login_stack.back();
         if(cur_account.privilege==7){
-            char index_[30];strcpy(index_,userid.c_str());
+            char index_[31];strcpy(index_,userid.c_str());
             std::pair<account,bool> result=users.find(index_);
             if(result.second){
                 strcpy(result.first.password,CurrentPassword.c_str());
@@ -78,7 +80,7 @@ void user::passwd(Tokenscanner &scanner){
     }
     std::string NewPassword=scanner.nextToken();
     if(!scanner.check(NewPassword,30,0))throw(error("Invalid"));
-    char index_[30];strcpy(index_,userid.c_str());
+    char index_[31];strcpy(index_,userid.c_str());
     std::pair<account,bool> result=users.find(index_);
     if(result.second){
         if(strcmp(result.first.password,CurrentPassword.c_str())==0){
@@ -107,7 +109,7 @@ void user::useradd(Tokenscanner &scanner){
     std::string username=scanner.nextToken();
     if(!scanner.check(username,30,1))throw(error("Invalid"));
     if(scanner.haveMoreTokens())throw(error("Invalid"));
-    char index_[30];strcpy(index_,userid.c_str());
+    char index_[31];strcpy(index_,userid.c_str());
     std::pair<account,bool> result=users.find(index_);
     if(result.second)throw(error("Invalid"));
     //操作

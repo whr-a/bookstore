@@ -9,10 +9,10 @@
 class account
 {
 public:
-    char ID[30];
-    char password[30];
+    char ID[31];
+    char password[31];
     int privilege;
-    char name[30];
+    char name[31];
     account(){}
     account(const char* ID_,const char* password_,const int privilege_,const char* name_){
         strcpy(ID,ID_);

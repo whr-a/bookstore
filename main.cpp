@@ -6,7 +6,7 @@
 #include "databaseplus.hpp"
 #include "error.hpp"
 
-void processLine(std::string &line,user &users,book &books);
+void processLine(std::string &line,user &users,book &books,diary &diarys);
 int main ()
 {
     std::ios::sync_with_stdio(false);
@@ -14,20 +14,23 @@ int main ()
     std::cout.tie(nullptr);
     user users;
     book books;
+    diary diarys;
     while (true) {
     try {
         std::string input;
         getline(std::cin, input);
         if (input.empty())
             return 0;
-        processLine(input,users,books);
+        //std::cout<<input<<std::endl;
+        processLine(input,users,books,diarys);
+        //std::cout<<"successfully done"<<'\n';
         if(users.checkquit())return 0;
     } catch (error &ex) {
         std::cout << ex.toString() << std::endl;
     }
   }
 }
-void processLine(std::string &line,user &users,book &books) {
+void processLine(std::string &line,user &users,book &books,diary &diarys) {
     Tokenscanner scanner;
     scanner.setInput(line);
     std::string s=scanner.nextToken();
@@ -39,11 +42,15 @@ void processLine(std::string &line,user &users,book &books) {
     else if(s=="useradd")users.useradd(scanner);
     else if(s=="delete")users.deleteuser(scanner);
     else if(s=="exit"||s=="quit"){users.quit();}
-    else if(s=="show")books.show(scanner,users);
-    else if(s=="buy")books.buy(scanner,users);
+    else if(s=="show"){
+        std::string next=scanner.see_nextToken();
+        if(next=="finance")diarys.show(scanner,users);
+        else books.show(scanner,users);
+    }
+    else if(s=="buy")books.buy(scanner,users,diarys);
     else if(s=="select")books.select(scanner, users);
     else if(s=="modify")books.modify(scanner,users);
-    else if(s=="import")books.import(scanner,users);
+    else if(s=="import")books.import(scanner,users,diarys);
     else throw(error("Invalid"));
 }
 // # 基础指令
