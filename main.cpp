@@ -7,6 +7,12 @@
 #include "error.hpp"
 
 void processLine(std::string &line,user &users,book &books,diary &diarys);
+bool check_check(std::string s){
+    for(int i=0;i<s.size();i++){
+        if(!(s[i]>=32 && s[i]<127))return false;
+    }
+    return true;
+}
 int main ()
 {
     std::ios::sync_with_stdio(false);
@@ -18,9 +24,8 @@ int main ()
     while (true) {
     try {
         std::string input;
-        getline(std::cin, input);
-        if (input.empty())
-            return 0;
+        if(!getline(std::cin, input))return 0;
+        if(!check_check(input))throw(error("Invalid"));
         //std::cout<<input<<std::endl;
         processLine(input,users,books,diarys);
         //std::cout<<"successfully done"<<'\n';

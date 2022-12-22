@@ -19,6 +19,7 @@ public:
         line=s;
         cur=0;
     }
+    
     std::string nextToken(){
         int i=cur;
         if(line[cur]=='\0')return "";
