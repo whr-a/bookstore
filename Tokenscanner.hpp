@@ -77,12 +77,14 @@ public:
                          s[i]=='_'))return false;
                 break;
             case 1:
+                for(int i=0;i<s.size();i++)
+                    if(!(s[i]>32 && s[i]<127))return false;
                 break;
             case 2:
                 for(int i=0;i<s.size();i++)if(!(s[i]>='0'&&s[i]<='9'))return false;
                 break;
             case 3:
-                for(int i=0;i<s.size();i++)if(s[i]=='\"')return false;
+                for(int i=0;i<s.size();i++)if(s[i]=='\"'||(!(s[i]>32 && s[i]<127)))return false;
                 break;
         }
         return true;
