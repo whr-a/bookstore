@@ -233,8 +233,9 @@ log
 
 主要类有：
 - TokenScanner类（负责切分指令）
-- login类（负责维护登录状态）
-- user类 （负责维护账户以及处理账户相关指令）
+- account类 （负责处理一个账户的信息）
+- user类 （负责维护账户、处理登陆状态以及处理账户相关指令）
+- book_inf类 （负责处理一本书的信息）
 - book类 （负责维护图书信息）
 - diary类 （负责记录日志）
 - error类 （负责处理抛出和接收错误信息）
@@ -247,110 +248,185 @@ log
 - std::string line 存储要处理的字符串
 
 函数：
-- TokenScanner () 构造函数，初始化为空
-- ~TokenScanner () 析构
-- std::string nextToken() 获得下一片切分
-- std::string check_next() 查看下一片切分，但是不更改line
-- bool have_more_token() 判断是否切分完毕
-
-### **login类**
-
+```
+TokenScanner () 构造函数，初始化为空
+~TokenScanner () 析构
+std::string nextToken() 获得下一片切分
+std::string see_nextToken() 查看下一片切分，但是不更改line
+bool haveMoreTokens() 判断是否切分完毕
+std::string nextToken_separate() 截取到=截止的字符串
+std::string nextToken_separate_plus() 截取引号之间的字符串
+bool check(const std::string &s,
+      int max_length,int mode) 检查字符串是否合法
+bool check_privilege(int x) 检查权限数字是否合法
+int check_num(std::string &s) 将字符串转化为整数，不合法返回-1
+int check_num_(std::string &s) 同上，但允许返回0
+bool check_keyword(std::string &s) 检查关键词集合是否合法
+bool is_num(char &x) 检查一个字符是否是数字
+double check_double(std::string &s) 将字符串转化为实数，不合法返回-1
+```
+### **account类**
 成员
-- std::stack< std::string > users 构造登录栈
-- std::string current_user 当前登录用户
-
+```
+char ID[31];
+char password[31];
+int privilege;
+char name[31];
+```
 函数
-- login () 初始化栈为空
-- ~login () 析构 
-- void Login(std::string name) 登录用户名为name的用户
-- void Logout() 退出上一次的登录
-- std::string get_login_user_name() 返回登录的用户名
-
+```
+account()
+account(const char* ID_,const char* password_,const int privilege_,const char* name_)
+account &operator= (const account &obj)
+friend bool operator<(const account &a,const account &b)
+friend bool operator>(const account &a,const account &b)
+friend bool operator==(const account &a,const account &b)
+friend bool operator>=(const account &a,const account &b)
+friend bool operator<=(const account &a,const account &b)
+```
 ### **user类**
 
 成员
 
 ```
-struct account
-{
-    std::string ID;
-    std::string name;
-    std::string password;
-    int priority;
-};
-private
-    map<std::string,account> account_list;
+database<account> users; 存账户信息的数据库
+std::vector<account> login_stack; 登录栈
+bool exit; 退出条件
 ```
 
 函数
 ```
-//注册用户
-void registeruser(account acc,login &log,TokenScanner scanner) 
-//删除用户 
-void deluser(account acc,login &log,TokenScanner scanner) 
-//修改密码
-void passwd(string id,login &log)
-//创建用户
-void adduser(account acc,login &log,TokenScanner scanner) 
+user(); 初始化，若第一次打开数据库则加入超级账户root
+void quit(); 设置即将退出
+bool checkquit(); 是否已有退出标记
+void su(Tokenscanner &scanner); 登录账户
+void logout(); 登出账户
+void Register(Tokenscanner &scanner); 注册账户
+void passwd(Tokenscanner &scanner); 修改密码
+void useradd(Tokenscanner &scanner); 创建账户
+void deleteuser(Tokenscanner &scanner); 删除用户
 ```
-
+### **book_inf类**
+成员
+```
+char ISBN[21];
+char bookname[61];
+char author[61];
+char keyword[61];
+int store;
+double price;
+```
+函数
+```
+book_inf()
+book_inf(const char* ISBN_,const char* bookname_,const char* author_,const char* keyword_)
+book_inf &operator= (const book_inf &obj)
+friend bool operator<(const book_inf &a,const book_inf &b)
+friend bool operator>(const book_inf &a,const book_inf &b)
+friend bool operator<=(const book_inf &a,const book_inf &b)
+friend bool operator>=(const book_inf &a,const book_inf &b)
+friend bool operator==(const book_inf &a,const book_inf &b)
+```
 ### **book类**
 
 成员
 ```
-struct book_information
-{
-    std::string ISBN, Bookname, Author, Keyword;
-    int Quantity;
-    double Price, TotalCost;
-};
-std::map<string, book_information> book_list;
+database<book_inf> books;
+std::vector<std::string> book_stack; 
 ```
 
 函数
 ```
-void show_book(std::string s) //查询书籍
-void buy_book(std::string ISBN, int quantity)//买书
-void select_book(std::string ISBN) //选书
-void modify(string s) //修改图书信息
-void import(int Quantity, double TotalCost) //进货
+static bool check(std::string s,book_inf book_,int mode) 检查是否合法
+void login() 登录的同时选一本空书
+void logout() 登出的同时取消选书
+void show(Tokenscanner &scanner,user &users) 查询书籍
+void buy(Tokenscanner &scanner,user &users,diary &diarys)买书
+void select(Tokenscanner &scanner,user &users) 选书
+void modify(Tokenscanner &scanner,user &users) 修改图书信息
+void import(Tokenscanner &scanner,user &users,diary &diarys) 进货
 ```
 
 ### **diary类**
 
 成员
 ```
-int Count;
-std::vector<int> income;
-std::vector<int> expense;
+int total;
+Database_<double> diarys;
 ```
 
 函数
 ```
-void query_diary(int count) //输出最后完成的指定笔数交易总额
-void query_log() //返回赏心悦目的日志记录
+diary() 初始化，从文件中获取笔数
+void add(double get) 加一笔账
+void show(Tokenscanner &scanner,user &users) 输出最后完成的指定笔数交易总额
+void log() 返回赏心悦目的日志记录
 ```
 
 ### **error类**
 
 成员
 ```
-std::string message;
+std::string msg;
 ```
  函数
  ```
- ErrorException(std::string message) {
-    this->message = message;
-}//记录错误信息
-void error(std::string message) {
-    throw ErrorException(message);
-}//抛出错误信息
+explicit error(const char *_msg_) 记录错误信息
+const char *toString() 抛出错误信息
  ```
 
 
  ## 文件存储说明
- - 所有运行过程中产生的信息都存储在相关的文本文档中
+ - 所有运行过程中产生的信息都存储在二进制文档中
+ - 本程序创建了两种database类，一种以字符串作为index，服务于user类和book类，另一种以int作为index，服务于diary类
 
-
+### **Database_类**
+- 该类以int作为index，服务于diary类。
+函数接口如下：
+```
+Database_()
+Database_(std::string name) 初始化文件名
+bool setfile(std::string name) 设置文件名
+~Database_() 关闭文件
+static inline void getNode(Node<T>& temp,int &num) 获得第num块链表
+static inline void modify_Node(int &num,Node<T> &Node_) 改变第num块链表
+static inline Head<T> getHead(int &num) 获得第num块链表的头
+static inline Data<T> getData(int &Head_num,int &Data_num) 获得第Head_num块链表的第Data_num个数据
+static inline Start getStart() 获得全文件的头
+static inline void modify_Data(int &Head_num,int &Data_num,Data<T> &Data_) 改变第Head_num块链表的第Data_num个数据
+static inline void modify_Head(int &Head_num,Head<T> &Head_) 改变第Head_num块链表的头
+static inline void modify_Start(Start &st) 更改全文件的头
+static inline int find_add_position(Data<T> &temp,Start &st) 找到temp应该插在第几块链表
+static inline void devide(int &Head_num) 裂开第Head_num块
+inline T find () 找到第一块的第一个数据，（下标为0）,用于找到目前有多少条日志记录
+inline void insert(int index_,T &value_) 插入元素
+inline std::vector<T> search(int index) 查找元素
+inline void add_one() 让日志总条数加一
+```
+### database类
+- 该类以字符串为index，服务于user类和book类
+函数接口
+```
+database()
+database(std::string name) 初始化文件名
+bool setfile(std::string name) 设置文件名
+~database() 关闭文件
+static inline void getnode(node<T>& temp,int &num) 获得第num块链表
+static inline void modify_node(int &num,node<T> &Node_) 改变第num块链表
+static inline head<T> gethead(int &num) 获得第num块链表的头
+static inline data<T> getdata(int &head_num,int &data_num) 获得第head_num块链表的第data_num个数据
+static inline start getstart() 获得全文件的头
+static inline void modify_data(int &head_num,int &data_num,data<T> &data_) 改变第head_num块链表的第data_num个数据
+static inline void modify_head(int &head_num,head<T> &head_) 改变第head_num块链表的头
+static inline void modify_start(start &st) 更改全文件的头
+static inline int find_add_position(data<T> &temp,start &st) 找到temp应该插在第几块链表
+static inline void devide(int &head_num) 裂开第head_num块
+static inline void merge(int &head_num) 对第head_num块进行并块
+inline void insert(char* index_,T &value_) 插入元素
+inline std::pair<T,bool> find (char* index_) 查找元素
+inline void Delete (char* index_,T &value_) 删除元素
+inline bool modify(char* index_,T change_to) 修改元素
+inline std::vector<T> search(char* index) 查找从index往后的所有元素
+```
  ## 其它补充说明
- **暂无（**
+ **暂无**
