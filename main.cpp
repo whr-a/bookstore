@@ -2,6 +2,7 @@
 #include "Tokenscanner.hpp"
 #include "book.hpp"
 #include "diary.hpp"
+#include "log.hpp"
 #include "user.hpp"
 #include "databaseplus.hpp"
 #include "error.hpp"
@@ -40,22 +41,27 @@ void processLine(std::string &line,user &users,book &books,diary &diarys) {
     scanner.setInput(line);
     std::string s=scanner.nextToken();
     if(s.empty())return;
-    if(s=="su"){users.su(scanner);books.login();}
-    else if(s=="logout"){users.logout();books.logout();}
-    else if(s=="register")users.Register(scanner);
-    else if(s=="passwd")users.passwd(scanner);
-    else if(s=="useradd")users.useradd(scanner);
-    else if(s=="delete")users.deleteuser(scanner);
+    if(s=="su"){users.su(scanner,diarys);books.login();}
+    else if(s=="logout"){users.logout(diarys);books.logout();}
+    else if(s=="register")users.Register(scanner,diarys);
+    else if(s=="passwd")users.passwd(scanner,diarys);
+    else if(s=="useradd")users.useradd(scanner,diarys);
+    else if(s=="delete")users.deleteuser(scanner,diarys);
     else if(s=="exit"||s=="quit"){users.quit();}
     else if(s=="show"){
         std::string next=scanner.see_nextToken();
-        if(next=="finance")diarys.show(scanner,users);
+        if(next=="finance"){
+            if(users.login_stack.empty())throw(error("Invalid"));
+            if(users.login_stack.back().privilege!=7)throw(error("Invalid"));
+            diarys.show(scanner);
+        }
         else books.show(scanner,users);
     }
     else if(s=="buy")books.buy(scanner,users,diarys);
-    else if(s=="select")books.select(scanner, users);
-    else if(s=="modify")books.modify(scanner,users);
+    else if(s=="select")books.select(scanner,users,diarys);
+    else if(s=="modify")books.modify(scanner,users,diarys);
     else if(s=="import")books.import(scanner,users,diarys);
+    else if(s=="log")diarys.log();
     else throw(error("Invalid"));
 }
 // # 基础指令

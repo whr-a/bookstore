@@ -6,11 +6,13 @@
 #include <string>
 #include "error.hpp"
 #include <iomanip>
-#include "user.hpp"
+#include "log.hpp"
+
 class diary{
 public:
     int total;
     Database_<double> diarys;
+    logs<int> log_inf;
     diary(){
         bool flag=diarys.setfile("diary");
         if(!flag){
@@ -29,9 +31,7 @@ public:
         diarys.insert(total,get);
         diarys.add_one();
     }
-    void show(Tokenscanner &scanner,user &users){
-        if(users.login_stack.empty())throw(error("Invalid"));
-        if(users.login_stack.back().privilege!=7)throw(error("Invalid"));
+    void show(Tokenscanner &scanner){
         scanner.nextToken();
         if(!scanner.haveMoreTokens()){
             std::vector<double> ans=diarys.search(1);
@@ -71,6 +71,11 @@ public:
             return;
         }
     }
+    void add_log(std::string &&s){
+        log_inf.add(s);
+    }
+    void log(){
+        log_inf.print();
+    }
 };
-
 #endif

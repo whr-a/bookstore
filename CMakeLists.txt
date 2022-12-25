@@ -14,4 +14,5 @@ add_executable(code
         book.cpp
         book.hpp
         diary.hpp
+        log.hpp
         )

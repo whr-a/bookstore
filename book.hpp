@@ -84,8 +84,8 @@ public:
     void logout();
     void show(Tokenscanner &scanner,user &users);
     void buy(Tokenscanner &scanner,user &users,diary &diarys);
-    void select(Tokenscanner &scanner,user &users);
-    void modify(Tokenscanner &scanner,user &users);
+    void select(Tokenscanner &scanner,user &users,diary &diarys);
+    void modify(Tokenscanner &scanner,user &users,diary &diarys);
     void import(Tokenscanner &scanner,user &users,diary &diarys);
 };
 

@@ -6,6 +6,7 @@
 #include <string>
 #include "Tokenscanner.hpp"
 #include "error.hpp"
+#include "diary.hpp"
 class account
 {
 public:
@@ -56,11 +57,11 @@ public:
     }
     void quit(){exit=1;}
     bool checkquit(){return exit;}
-    void su(Tokenscanner &scanner);
-    void logout();
-    void Register(Tokenscanner &scanner);
-    void passwd(Tokenscanner &scanner);
-    void useradd(Tokenscanner &scanner);
-    void deleteuser(Tokenscanner &scanner);
+    void su(Tokenscanner &scanner,diary &diarys);
+    void logout(diary &diarys);
+    void Register(Tokenscanner &scanner,diary &diarys);
+    void passwd(Tokenscanner &scanner,diary &diarys);
+    void useradd(Tokenscanner &scanner,diary &diarys);
+    void deleteuser(Tokenscanner &scanner,diary &diarys);
 };
 #endif

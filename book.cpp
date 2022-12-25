@@ -1,5 +1,6 @@
 #include "book.hpp"
 #include <iomanip>
+#include <string>
 
 void print(book_inf &x){
     std::cout<<x.ISBN<<'\t'
@@ -127,9 +128,12 @@ void book::buy(Tokenscanner &scanner,user &users,diary &diarys){
     diarys.add(ans);
     t.store-=num;
     books.modify(index,t);
+    std::string userid=users.login_stack.back().ID;
+    diarys.add_log(userid+" bought "+std::to_string(num)+" books. "
+                +"ISBN:"+ISBN_+". "+"Earned "+std::to_string(ans));
 }
 
-void book::select(Tokenscanner &scanner,user &users){
+void book::select(Tokenscanner &scanner,user &users,diary &diarys){
     if(users.login_stack.empty())throw(error("Invalid"));
     if(users.login_stack.back().privilege<3)throw(error("Invalid"));
     std::string ISBN_;
@@ -148,9 +152,11 @@ void book::select(Tokenscanner &scanner,user &users){
         book_stack.pop_back();
         book_stack.push_back(ISBN_);
     }
+    std::string userid=users.login_stack.back().ID;
+    diarys.add_log(userid+" select "+ISBN_+".");
 }
 
-void book::modify(Tokenscanner &scanner,user &users){
+void book::modify(Tokenscanner &scanner,user &users,diary &diarys){
     if(users.login_stack.empty())throw(error("Invalid"));
     if(users.login_stack.back().privilege<3)throw(error("Invalid"));
     if(!scanner.haveMoreTokens())throw(error("Invalid"));
@@ -206,6 +212,9 @@ void book::modify(Tokenscanner &scanner,user &users){
     }
     if(vis[0]==0){
         books.modify(index,t);
+        std::string userid=users.login_stack.back().ID;
+        std::string isbn=index;
+        diarys.add_log(userid+" modify "+isbn+".");
     }
     else{
         char index_[21];strcpy(index_,t.ISBN);
@@ -220,6 +229,10 @@ void book::modify(Tokenscanner &scanner,user &users){
             book_stack[x]=t.ISBN;
             x=find(book_stack.begin()+x+1,book_stack.end(),tep)-book_stack.begin();
         }
+        std::string userid=users.login_stack.back().ID;
+        std::string isbn=index;
+        std::string ISBN=t.ISBN;
+        diarys.add_log(userid+" modify "+isbn+" to "+ISBN+".");
     }
 }
 
@@ -238,4 +251,5 @@ void book::import(Tokenscanner &scanner,user &users,diary &diarys){
     std::pair<book_inf,bool> result=books.find(index);
     result.first.store+=quantity;
     books.modify(index,result.first);
+    diarys.add_log("import "+book_stack.back()+" "+quantity_+".Paid "+totalcost_+".");
 }

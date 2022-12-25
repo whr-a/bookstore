@@ -1,7 +1,7 @@
 #include "user.hpp"
 #include <cstring>
 
-void user::su(Tokenscanner &scanner){
+void user::su(Tokenscanner &scanner,diary &diarys){
     std::string userid=scanner.nextToken();
     if(!scanner.check(userid,30,0))throw(error("Invalid"));
     std::string in_password=scanner.nextToken();
@@ -16,6 +16,7 @@ void user::su(Tokenscanner &scanner){
         if(strcmp(in_password.c_str(),t.password)==0){
             login_stack.push_back(t);
             //std::cout<<"su successfully"<<'\n';//**********
+            diarys.add_log(userid+" login.");
         }
         else throw(error("Invalid"));
     }
@@ -25,18 +26,20 @@ void user::su(Tokenscanner &scanner){
         if(cur_account.privilege>t.privilege){
             login_stack.push_back(t);
             //std::cout<<"su successfully"<<'\n';//**********
+            diarys.add_log(userid+" login.");
         }
         else throw(error("Invalid"));
     }
 }
-void user::logout(){
+void user::logout(diary &diarys){
     if(login_stack.empty())throw(error("Invalid"));
-    if(login_stack.back().privilege==0)throw(error("Invalid"));
-    else login_stack.pop_back();
+    std::string s=login_stack.back().ID;
+    diarys.add_log(s+" logout.");
+    login_stack.pop_back();
     //std::cout<<"logout successfully"<<'\n';//**********
 }
 
-void user::Register(Tokenscanner &scanner){
+void user::Register(Tokenscanner &scanner,diary &diarys){
     account temp;
     std::string userid=scanner.nextToken();
     if(!scanner.check(userid,30,0))throw(error("Invalid"));
@@ -53,10 +56,11 @@ void user::Register(Tokenscanner &scanner){
     temp.privilege=1;
     strcpy(temp.name,username.c_str());
     users.insert(index_,temp);
+    diarys.add_log("registered "+userid+'.');
     //std::cout<<"Register successfully"<<'\n';//**********
 }
 
-void user::passwd(Tokenscanner &scanner){
+void user::passwd(Tokenscanner &scanner,diary &diarys){
     if(login_stack.empty())throw(error("Invalid"));
     else if(login_stack.back().privilege==0)throw(error("Invalid"));
     std::string userid=scanner.nextToken();
@@ -72,6 +76,7 @@ void user::passwd(Tokenscanner &scanner){
                 strcpy(result.first.password,CurrentPassword.c_str());
                 users.modify(index_,result.first);
                 //std::cout<<"passwd successfully"<<'\n';//**********
+                diarys.add_log(userid+"\'s password is changed.");
                 return;
             }
             else throw(error("Invalid"));
@@ -87,13 +92,14 @@ void user::passwd(Tokenscanner &scanner){
             strcpy(result.first.password,NewPassword.c_str());
             users.modify(index_,result.first);
             //std::cout<<"passwd successfully"<<'\n';//**********
+            diarys.add_log(userid+"\'s password is changed.");
         }
         else throw(error("Invalid"));
     }
     else throw(error("Invalid"));
 }
 
-void user::useradd(Tokenscanner &scanner){
+void user::useradd(Tokenscanner &scanner,diary &diarys){
     //正确性判断
     if(login_stack.empty())throw(error("Invalid"));
     else if(login_stack.back().privilege<3)throw(error("Invalid"));
@@ -116,9 +122,10 @@ void user::useradd(Tokenscanner &scanner){
     account temp(userid.c_str(),password.c_str(),privilege,username.c_str());
     users.insert(index_,temp);
     //std::cout<<"useradd successfully"<<'\n';//**********
+    diarys.add_log("user: "+userid+" added.");
 }
 
-void user::deleteuser(Tokenscanner &scanner){
+void user::deleteuser(Tokenscanner &scanner,diary &diarys){
     if(login_stack.empty())throw(error("Invalid"));
     else if(login_stack.back().privilege!=7)throw(error("Invalid"));
     std::string userid=scanner.nextToken();
@@ -130,4 +137,5 @@ void user::deleteuser(Tokenscanner &scanner){
         throw(error("Invalid"));
     users.Delete(index_,t);
     //std::cout<<"delete successfully"<<'\n';//**********
+    diarys.add_log("user: "+userid+" deleted.");
 }
