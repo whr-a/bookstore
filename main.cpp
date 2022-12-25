@@ -61,7 +61,11 @@ void processLine(std::string &line,user &users,book &books,diary &diarys) {
     else if(s=="select")books.select(scanner,users,diarys);
     else if(s=="modify")books.modify(scanner,users,diarys);
     else if(s=="import")books.import(scanner,users,diarys);
-    else if(s=="log")diarys.log();
+    else if(s=="log"){
+        if(users.login_stack.empty())throw(error("Invalid"));
+        if(users.login_stack.back().privilege!=7)throw(error("Invalid"));
+        diarys.log();
+    }
     else throw(error("Invalid"));
 }
 // # 基础指令
